@@ -1,0 +1,212 @@
+{
+  "id": 6,
+  "institution_id": 2,
+  "title": "Optio a quis perferendis et suscipit alias facilis.",
+  "description": "Repellat porro unde id eaque. Aut nobis in delectus. Ullam id esse ipsum odit maiores cupiditate.",
+  "duration": 87,
+  "status": "active",
+  "external_content_id": null,
+  "external_event_courses": [],
+  "created_at": "2025-02-10T18:03:26.000000Z",
+  "updated_at": "2025-02-10T18:03:26.000000Z",
+  "event_courses": [
+    {
+      "id": 31,
+      "event_id": 6,
+      "course_session_id": 31,
+      "status": "active",
+      "num_of_questions": null,
+      "created_at": "2025-02-10T18:03:27.000000Z",
+      "updated_at": "2025-02-10T18:03:27.000000Z",
+      "course_session": {
+        "id": 31,
+        "course_id": 31,
+        "session": "2023",
+        "category": "",
+        "general_instructions": null,
+        "file_version": 0,
+        "file_path": null,
+        "created_at": "2025-02-10T18:03:26.000000Z",
+        "updated_at": "2025-02-10T18:03:26.000000Z",
+        "course": {
+          "id": 31,
+          "institution_id": 2,
+          "exam_content_id": null,
+          "course_code": "Commerce",
+          "category": "ab",
+          "course_title": "iste in officia ut aut labore minima",
+          "description": "Sint aperiam dolorem quia perferendis quis facere et.",
+          "order": 1000,
+          "is_file_content_uploaded": 0,
+          "created_at": "2025-02-10T18:03:26.000000Z",
+          "updated_at": "2025-02-10T18:03:26.000000Z"
+        }
+      }
+    },
+    {
+      "id": 32,
+      "event_id": 6,
+      "course_session_id": 32,
+      "status": "active",
+      "num_of_questions": null,
+      "created_at": "2025-02-10T18:03:27.000000Z",
+      "updated_at": "2025-02-10T18:03:27.000000Z",
+      "course_session": {
+        "id": 32,
+        "course_id": 32,
+        "session": "2019",
+        "category": "",
+        "general_instructions": null,
+        "file_version": 0,
+        "file_path": null,
+        "created_at": "2025-02-10T18:03:26.000000Z",
+        "updated_at": "2025-02-10T18:03:26.000000Z",
+        "course": {
+          "id": 32,
+          "institution_id": 2,
+          "exam_content_id": null,
+          "course_code": "CRS",
+          "category": "eos",
+          "course_title": "et asperiores dolorum minima voluptates quo sint",
+          "description": "Est sunt enim officiis et qui assumenda.",
+          "order": 1000,
+          "is_file_content_uploaded": 0,
+          "created_at": "2025-02-10T18:03:26.000000Z",
+          "updated_at": "2025-02-10T18:03:26.000000Z"
+        }
+      }
+    },
+    {
+      "id": 33,
+      "event_id": 6,
+      "course_session_id": 33,
+      "status": "active",
+      "num_of_questions": null,
+      "created_at": "2025-02-10T18:03:27.000000Z",
+      "updated_at": "2025-02-10T18:03:27.000000Z",
+      "course_session": {
+        "id": 33,
+        "course_id": 33,
+        "session": "2001",
+        "category": "",
+        "general_instructions": null,
+        "file_version": 0,
+        "file_path": null,
+        "created_at": "2025-02-10T18:03:26.000000Z",
+        "updated_at": "2025-02-10T18:03:26.000000Z",
+        "course": {
+          "id": 33,
+          "institution_id": 2,
+          "exam_content_id": null,
+          "course_code": "Government",
+          "category": "error",
+          "course_title": "voluptatem et et ut voluptas ipsam quisquam",
+          "description": "Consectetur voluptas sed neque quibusdam atque accusamus.",
+          "order": 1000,
+          "is_file_content_uploaded": 0,
+          "created_at": "2025-02-10T18:03:26.000000Z",
+          "updated_at": "2025-02-10T18:03:26.000000Z"
+        }
+      }
+    },
+    {
+      "id": 34,
+      "event_id": 6,
+      "course_session_id": 34,
+      "status": "active",
+      "num_of_questions": null,
+      "created_at": "2025-02-10T18:03:27.000000Z",
+      "updated_at": "2025-02-10T18:03:27.000000Z",
+      "course_session": {
+        "id": 34,
+        "course_id": 34,
+        "session": "2006",
+        "category": "",
+        "general_instructions": null,
+        "file_version": 0,
+        "file_path": null,
+        "created_at": "2025-02-10T18:03:27.000000Z",
+        "updated_at": "2025-02-10T18:03:27.000000Z",
+        "course": {
+          "id": 34,
+          "institution_id": 2,
+          "exam_content_id": null,
+          "course_code": "Social Studies",
+          "category": "accusantium",
+          "course_title": "corrupti corrupti beatae distinctio enim quaerat voluptas",
+          "description": "At consequatur et dolor neque illum.",
+          "order": 1000,
+          "is_file_content_uploaded": 0,
+          "created_at": "2025-02-10T18:03:27.000000Z",
+          "updated_at": "2025-02-10T18:03:27.000000Z"
+        }
+      }
+    },
+    {
+      "id": 35,
+      "event_id": 6,
+      "course_session_id": 35,
+      "status": "active",
+      "num_of_questions": null,
+      "created_at": "2025-02-10T18:03:27.000000Z",
+      "updated_at": "2025-02-10T18:03:27.000000Z",
+      "course_session": {
+        "id": 35,
+        "course_id": 35,
+        "session": "2007",
+        "category": "",
+        "general_instructions": null,
+        "file_version": 0,
+        "file_path": null,
+        "created_at": "2025-02-10T18:03:27.000000Z",
+        "updated_at": "2025-02-10T18:03:27.000000Z",
+        "course": {
+          "id": 35,
+          "institution_id": 2,
+          "exam_content_id": null,
+          "course_code": "Government",
+          "category": "saepe",
+          "course_title": "aut maxime quo illo itaque perspiciatis incidunt",
+          "description": "Quo enim ut enim sed dignissimos.",
+          "order": 1000,
+          "is_file_content_uploaded": 0,
+          "created_at": "2025-02-10T18:03:27.000000Z",
+          "updated_at": "2025-02-10T18:03:27.000000Z"
+        }
+      }
+    },
+    {
+      "id": 36,
+      "event_id": 6,
+      "course_session_id": 36,
+      "status": "active",
+      "num_of_questions": null,
+      "created_at": "2025-02-10T18:03:27.000000Z",
+      "updated_at": "2025-02-10T18:03:27.000000Z",
+      "course_session": {
+        "id": 36,
+        "course_id": 36,
+        "session": "2005",
+        "category": "",
+        "general_instructions": null,
+        "file_version": 0,
+        "file_path": null,
+        "created_at": "2025-02-10T18:03:27.000000Z",
+        "updated_at": "2025-02-10T18:03:27.000000Z",
+        "course": {
+          "id": 36,
+          "institution_id": 2,
+          "exam_content_id": null,
+          "course_code": "Yoruba",
+          "category": "nostrum",
+          "course_title": "exercitationem architecto commodi velit ut quam enim",
+          "description": "Officia quis et soluta.",
+          "order": 1000,
+          "is_file_content_uploaded": 0,
+          "created_at": "2025-02-10T18:03:27.000000Z",
+          "updated_at": "2025-02-10T18:03:27.000000Z"
+        }
+      }
+    }
+  ]
+}
