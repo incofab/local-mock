@@ -55,4 +55,9 @@ class EventController extends Controller
       $res->getMessage()
     );
   }
+  function uploadEventExams(Event $event)
+  {
+    $res = (new EventExamsHandler($event))->uploadEventExams();
+    return back()->with('message', $res->getMessage());
+  }
 }

@@ -3,8 +3,6 @@ namespace App\Support;
 
 use App\Actions\InstitutionHandler;
 use App\Models\Event;
-use App\Models\Exam;
-use Illuminate\Support\Facades\Http;
 
 class WebsiteHelper
 {
@@ -19,6 +17,7 @@ class WebsiteHelper
   const UPLOAD_EVENT_RESULT = 'events/{event}/upload-result';
   const LIST_EVENT_EXAMS = 'events/{event}/exams';
   const SHOW_INSTITUTION = 'show-institution';
+  const UPLOAD_EXAMS = 'exams/upload';
 
   function __construct()
   {
@@ -97,6 +96,12 @@ class WebsiteHelper
       $this->url(self::LIST_EVENT_EXAMS, ['event' => $eventId])
     );
     return $res->json('data', []);
+  }
+
+  function uploadExams(array $exams): bool
+  {
+    $res = http()->post($this->url(self::UPLOAD_EXAMS), ['exams' => $exams]);
+    return $res->ok();
   }
 
   /**

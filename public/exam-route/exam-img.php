@@ -1,47 +1,16 @@
 <?php
+require_once 'exam-route-base.php';
 
-require_once 'public/exam-route/exam-route-base.php';
+$courseId = $_REQUEST['course_id'] ?? null;
+$courseSessionId = $_REQUEST['course_session_id'] ?? null;
+$filename = $_REQUEST['filename'] ?? null;
+$session = $_REQUEST['session'] ?? null;
+$eventId = $_REQUEST['event_id'] ?? null;
 
-$originalUrl = substr(
-  $_SERVER['REQUEST_URI'],
-  0,
-  stripos($_SERVER['REQUEST_URI'], '&filename'),
-);
-$urlParts = parse_url($originalUrl)['query'];
-parse_str($urlParts, $urlQueryParts);
+$file =
+  __DIR__ .
+  "/../content/event_$eventId/images/session_{$courseSessionId}_$filename";
 
-/** $courseId here is the Course code */
-$courseId = $urlQueryParts['course_id']; //$_REQUEST['course_id'];
-$course_session_id = $urlQueryParts['course_session_id']; //$_REQUEST['course_session_id'];
-$year = $_REQUEST['session'];
-
-$filename = parseFilename($_REQUEST['filename']);
-$slashPos = strrpos($filename, '/');
-$filename = trim(substr($filename, $slashPos), '/');
-// dlog_22('Filename = '.$filename);
-/*
-// dlog_22("Filename 1 = $filename");
-if(stripos($filename, '?')){
-    $filename = substr($filename, 0, stripos($filename, '?'));
-}
-
-// dlog_22("Filename 2 = $filename");
-if($slashPositon = strripos($filename, '/')){
-    $filename = substr($filename, $slashPositon+1);
-}
-// dlog_22("Filename 3 = $filename");
-// $filename = pathinfo($filename, PATHINFO_FILENAME);
-*/
-
-$file = "../public/img/content/$courseId/$course_session_id/$filename";
-$file2 = "../public/img/content/$courseId/$year/$filename";
-
-// dlog_22("File = $file");
-// dlog_22("File 2 = $file2");
-
-if (!file_exists($file)) {
-  $file = $file2;
-}
 if (!file_exists($file)) {
   return null;
 }
@@ -50,20 +19,3 @@ $type = 'image/jpeg';
 header('Content-Type:' . $type);
 header('Content-Length: ' . filesize($file));
 readfile($file);
-
-function parseFilename($filename)
-{
-  $urlparts = parse_url($filename); //['path'];//getUrlPath();
-
-  if (empty($urlparts['path'])) {
-    return $filename;
-  }
-  //         dDie($urlparts);
-  if (empty($urlparts['query'])) {
-    return $urlparts['path'];
-  }
-
-  parse_str($urlparts['query'], $urlparts2);
-
-  return parseFilename($urlparts2['filename']);
-}

@@ -20,6 +20,9 @@ return new class extends Migration {
       // $table->text('exam_nos')->nullable(true);
       $table->string('status')->default('active');
       $table->json('event_courses')->nullable();
+      $table->dateTime('uploaded_at')->nullable();
+      $table->unsignedBigInteger('external_content_id')->nullable();
+      $table->json('external_event_courses')->nullable();
 
       $table->timestamps();
     });

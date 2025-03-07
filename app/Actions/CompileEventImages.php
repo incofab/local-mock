@@ -18,7 +18,7 @@ class CompileEventImages
 
   function run()
   {
-    $this->event->event_courses->each(function (EventCourse $eventCourse) {
+    $this->event->getEventCourses()->each(function (EventCourse $eventCourse) {
       $courseSession = $eventCourse->course_session;
 
       $questionHtml = $this->getQuestionHtml($courseSession);

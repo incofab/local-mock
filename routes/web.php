@@ -36,9 +36,15 @@ Route::name('admin.')->middleware('auth', 'verify.institution')->prefix('admin/'
     Route::get('events/{event}/refresh', [Admin\EventController::class, 'refreshEvent'])->name('events.refresh');
     Route::get('events/{event}/download', [Admin\EventController::class, 'download'])->name('events.download');
     Route::get('events/{event}/evaluate', [Admin\EventController::class, 'evaluateEVent'])->name('events.evaluate');
+    Route::get('events/{event}/upload', [Admin\EventController::class, 'uploadEventExams'])->name('events.upload');
     
     Route::get('exams/events/{event}/index', [Admin\ExamController::class, 'index'])->name('exams.index');
     Route::get('exams/{exam}/evaluate', [Admin\ExamController::class, 'evaluateExam'])->name('exams.evaluate');
     Route::get('exams/{exam}/extend-time', [Admin\ExamController::class, 'extentTimeView'])->name('exams.extend-time');
     Route::post('exams/{exam}/extend-time', [Admin\ExamController::class, 'extentTimeStore'])->name('exams.extend-time.store');
+});
+
+Route::get('/reset-exam/{exam:exam_no}', function (\App\Models\Exam $exam) {
+    $exam->markAsStarted();
+    return 'Exam restarted';
 });

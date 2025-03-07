@@ -24,7 +24,7 @@
                 @foreach ($records as $record)
                 <tr>
                     <td><a href="{{route('admin.events.show', $record)}}">{{$record->title}}</a></td>
-                    <td>{{$record->event_courses->count()}}</td>
+                    <td>{{$record->getEventCourses()->count()}}</td>
                     <td>{{$record->duration}}</td>
                     <td>{{$record->exams_count}}</td>
                     <td>{{$record->created_at}}</td>
@@ -37,6 +37,9 @@
                         </a>
                         <a href="{{route('admin.events.download', $record)}}" class="btn btn-info btn-sm mt-2">
                             <i class="fa fa-download"></i> Download
+                        </a>
+                        <a href="{{route('admin.events.upload', $record)}}" class="btn btn-info btn-sm mt-2">
+                            <i class="fa fa-upload"></i> Upload
                         </a>
                         <a href="{{route('admin.events.evaluate', $record)}}" class="btn btn-danger btn-sm mt-2" 
                             onclick="return confirm('Do you want to submit all exams in this event?')">

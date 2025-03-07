@@ -1,7 +1,8 @@
 @extends('admin.layout', ['pageTitle' => 'Admin Dashboard'])
 @section('content')
 <div>
-    <h1>Welcome</h1>
+    <h3>{{$institution->name}}</h3>
+    <br>
     {{-- <p>This is a simple dashboard layout using Bootstrap 5. Customize it as needed!</p> --}}
 
     <div class="row">

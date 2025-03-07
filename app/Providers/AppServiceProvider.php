@@ -19,8 +19,8 @@ class AppServiceProvider extends ServiceProvider
    */
   public function boot(): void
   {
-    if (config('app.debug')) {
-      \App\Actions\FakeData::make()->run();
-    }
+    // if (config('app.debug')) {
+    //   \App\Actions\FakeData::make()->run();
+    // }
   }
 }

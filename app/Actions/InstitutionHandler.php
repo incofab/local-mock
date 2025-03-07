@@ -4,7 +4,6 @@ namespace App\Actions;
 use App\Models\Institution;
 use App\Support\Res;
 use App\Support\WebsiteHelper;
-use Illuminate\Support\Facades\Http;
 
 class InstitutionHandler
 {

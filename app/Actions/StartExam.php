@@ -63,6 +63,7 @@ class StartExam
       $examCourse->course_session = $courseSession;
     }
     $exam->event->event_courses = [];
+    $exam->event->external_event_courses = [];
     return $exam;
   }
 

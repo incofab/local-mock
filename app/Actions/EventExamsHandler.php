@@ -28,6 +28,9 @@ class EventExamsHandler
    */
   function downloadEventContent()
   {
+    // Extend the PHP timeout to 120 minutes (7200 seconds)
+    ini_set('max_execution_time', 2 * 60 * 60);
+
     $event = WebsiteHelper::make()->getEventForExam($this->event->id);
     $exams = WebsiteHelper::make()->getExams($this->event->id);
 
@@ -42,7 +45,11 @@ class EventExamsHandler
     }
     $this->filePath->createFolders();
 
-    foreach ($event['event_courses'] as $eventCourse) {
+    $eventCourses =
+      $event['external_content_id'] ?? false
+        ? $event['external_event_courses']
+        : $event['event_courses'];
+    foreach ($eventCourses as $eventCourse) {
       $courseSessionFilename = $this->filePath->courseSessionFilename(
         $eventCourse['course_session_id']
       );
@@ -76,7 +83,7 @@ class EventExamsHandler
     }
 
     (new CompileEventImages(
-      $this->event,
+      new Event($event),
       $this->filePath->getImagesFolder()
     ))->run();
     return successRes('Exams downloaded successfully');
@@ -123,6 +130,18 @@ class EventExamsHandler
     $content = @file_get_contents($this->filePath->examFilename($examNo));
     $content = json_decode($content ?? '', true);
     return $content ? new Exam($content) : null;
+  }
+
+  function uploadEventExams()
+  {
+    $this->event
+      ->exams()
+      ->getQuery()
+      ->chunk(100, function ($exams) {
+        $success = WebsiteHelper::make()->uploadExams($exams->toArray());
+      });
+    $this->event->fill(['uploaded_at' => now()])->save();
+    return successRes('Event exams uploaded');
   }
 
   /** Not in use at the moment */

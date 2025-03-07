@@ -49,7 +49,7 @@ class ExamHandler
     $examFileContent = $contentRes->getExamTrack() ?? [];
     $examFileContent['exam'] = $examData;
     $examFileContent['attempts'] =
-      $examFileContent['attempts'] ?? $exam->attempts;
+      $examFileContent['attempts'] ?? ($exam->attempts ?? []);
     // info($exam->toArray());
     // info($examData);
     $ret = $this->saveFile($contentRes->getFile(), $examFileContent);

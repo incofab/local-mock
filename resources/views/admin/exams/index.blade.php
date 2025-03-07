@@ -37,7 +37,7 @@
                     <td>{{$record->student->name}}</td>
                     <td>{{$record->status}}</td>
                     <td>{{$record->score}}</td>
-                    <td><small>{{$record->exam_courses->map(fn($item) => "{$item->course_session->course->course_code}")->join(', ')}}</small></td>
+                    <td><small>{{$record->exam_courses->map(fn($item) => "{$item->course_code}")->join(', ')}}</small></td>
                     <td class="end-time"></td>
                     <td>{{$record->num_of_questions}}</td>
                     <td><small>{{$record->created_at}}</small></td>

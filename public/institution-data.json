@@ -1,7 +1,12 @@
 {
-    "code": "ABC1234",
+    "id": 1,
+    "created_by_user_id": 1,
+    "code": "279422",
     "name": "Success Academy",
-    "address": "123, Fake Street, Fake City",
-    "phone": "1234567890",
-    "email": "email@email.com"
+    "address": null,
+    "phone": "09044953359",
+    "email": "hizexywax@mailinator.com",
+    "status": "active",
+    "created_at": "2025-03-02T17:06:32.000000Z",
+    "updated_at": "2025-03-02T17:06:32.000000Z"
 }
