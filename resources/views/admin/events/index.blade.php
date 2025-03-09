@@ -32,17 +32,21 @@
                         <a href="{{route('admin.exams.index', $record)}}" class="btn btn-success btn-sm btn-link mt-2">
                             Exams
                         </a>
-                        <a href="{{route('admin.events.refresh', $record)}}" class="btn btn-success btn-sm mt-2">
+                        <a href="{{route('admin.events.refresh', $record)}}" 
+                            class="btn btn-success btn-sm mt-2" title="Reload the event details">
                             <i class="fa fa-refresh"></i> Refresh
                         </a>
-                        <a href="{{route('admin.events.download', $record)}}" class="btn btn-info btn-sm mt-2">
+                        <a href="{{route('admin.events.download', $record)}}"
+                            class="btn btn-info btn-sm mt-2" title="Download all exams registered to this event">
                             <i class="fa fa-download"></i> Download
                         </a>
-                        <a href="{{route('admin.events.upload', $record)}}" class="btn btn-info btn-sm mt-2">
+                        <a href="{{route('admin.events.upload', $record)}}"
+                            class="btn btn-info btn-sm mt-2" title="Upload exam results">
                             <i class="fa fa-upload"></i> Upload
                         </a>
                         <a href="{{route('admin.events.evaluate', $record)}}" class="btn btn-danger btn-sm mt-2" 
-                            onclick="return confirm('Do you want to submit all exams in this event?')">
+                            onclick="return confirm('Do you want to submit all exams in this event?')"
+                            title="Evaluate all exams">
                             <i class="fa fa-check"></i> Calculate
                         </a>
                     </td>
