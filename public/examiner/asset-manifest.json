@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "http://localhost/examiner/static/css/main.7c75c0a8.css",
-    "main.js": "http://localhost/examiner/static/js/main.551fc7ee.js",
-    "index.html": "http://localhost/examiner/index.html",
-    "main.7c75c0a8.css.map": "http://localhost/examiner/static/css/main.7c75c0a8.css.map",
-    "main.551fc7ee.js.map": "http://localhost/examiner/static/js/main.551fc7ee.js.map"
+    "main.css": "/examiner/static/css/main.7c75c0a8.css",
+    "main.js": "/examiner/static/js/main.fb752399.js",
+    "index.html": "/examiner/index.html",
+    "main.7c75c0a8.css.map": "/examiner/static/css/main.7c75c0a8.css.map",
+    "main.fb752399.js.map": "/examiner/static/js/main.fb752399.js.map"
   },
   "entrypoints": [
     "static/css/main.7c75c0a8.css",
-    "static/js/main.551fc7ee.js"
+    "static/js/main.fb752399.js"
   ]
 }
