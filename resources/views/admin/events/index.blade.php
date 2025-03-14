@@ -8,6 +8,7 @@
             <i class="fa fa-reload"></i> Sync Events
         </a>
     </div>
+    @include('common.message')
     <div class="table-responsive">
         <table class="table table-bordered table-striped table-hover">
             <thead>
@@ -37,11 +38,13 @@
                             <i class="fa fa-refresh"></i> Refresh
                         </a>
                         <a href="{{route('admin.events.download', $record)}}"
-                            class="btn btn-info btn-sm mt-2" title="Download all exams registered to this event">
+                            class="btn btn-info btn-sm mt-2" title="Download all exams registered to this event"
+                            onclick="return confirm('This operation will take some time. Do not interrupt')">
                             <i class="fa fa-download"></i> Download
                         </a>
                         <a href="{{route('admin.events.upload', $record)}}"
-                            class="btn btn-info btn-sm mt-2" title="Upload exam results">
+                            class="btn btn-info btn-sm mt-2" title="Upload exam results"
+                            onclick="return confirm('Upload all exams in the event to the portal')">
                             <i class="fa fa-upload"></i> Upload
                         </a>
                         <a href="{{route('admin.events.evaluate', $record)}}" class="btn btn-danger btn-sm mt-2" 

@@ -43,9 +43,10 @@ class EndExam
     $eventExamHandler = new EventExamsHandler($exam->event);
     /** @var \App\Models\ExamCourse $examCourse */
     foreach ($examCourses as $examCourse) {
-      $questions = $eventExamHandler->getCourseSession(
-        $examCourse->course_session_id
-      )?->questions;
+      $questions =
+        $eventExamHandler->getCourseSession($examCourse->course_session_id)[
+          'questions'
+        ] ?? [];
 
       $scoreDetail = $this->examHandler->calculateScoreFromFile(
         $exam,

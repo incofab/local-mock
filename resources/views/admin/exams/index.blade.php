@@ -7,6 +7,7 @@
             <i class="fa fa-reload"></i> Evaluate Results
         </a>
     </div>
+    @include('common.message')
     <div class="table-responsive">
         <table class="table table-bordered table-striped table-hover" id="examTable">
             <thead>
@@ -49,7 +50,7 @@
                         @endif
                         @if($isOngoing || $record->canExtendTime())
                         <a href="{{route('admin.exams.evaluate', $record)}}" class="btn btn-danger btn-sm mt-2" onclick="return confirm('Do you want to submit this exam?')">
-                            <i class="fa fa-reload"></i> {{$examFileData['status']=== 'ended' ? 'Evaluate' : 'Submit'}}
+                            <i class="fa fa-reload"></i> {{($record->score == null) ? 'Evaluate' : 'Re-Evaluate'}}
                         </a>
                         @endif
                     </td>
