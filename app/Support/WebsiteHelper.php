@@ -101,11 +101,11 @@ class WebsiteHelper
   function uploadExams(array $exams): bool
   {
     $res = http()->post($this->url(self::UPLOAD_EXAMS), ['exams' => $exams]);
-    info([
-      'res' => $res->json(),
-      'url' => $this->url(self::UPLOAD_EXAMS),
-      'body' => $res->body(),
-    ]);
+    // info([
+    //   'data' => json_encode($exams, JSON_PRETTY_PRINT),
+    //   'res' => $res->json(),
+    //   'url' => $this->url(self::UPLOAD_EXAMS),
+    // ]);
     return $res->ok();
   }
 

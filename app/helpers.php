@@ -104,6 +104,8 @@ if (!function_exists('currentInstitution')) {
 if (!function_exists('http')) {
   function http(): \Illuminate\Http\Client\PendingRequest
   {
-    return Http::withOptions(['verify' => false]);
+    return Http::withOptions(['verify' => false])
+      ->acceptJson()
+      ->contentType('application/json');
   }
 }
