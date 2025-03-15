@@ -73,9 +73,9 @@ class ExamProcess
     return $this;
   }
 
-  public function hasContent(): bool
+  public function hasExamTrack(): bool
   {
-    return !empty($this->content);
+    return !empty($this->exam_track);
   }
 
   /**

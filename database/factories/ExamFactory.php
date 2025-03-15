@@ -48,6 +48,18 @@ class ExamFactory extends Factory
     );
   }
 
+  function started()
+  {
+    return $this->state(
+      fn(array $attr) => [
+        'start_time' => now(),
+        'pause_time' => null,
+        'end_time' => now()->addMinutes(30),
+        'active' => ExamStatus::Active,
+      ]
+    );
+  }
+
   function event(Event $event)
   {
     return $this->state(

@@ -8,25 +8,46 @@ use Illuminate\Support\Facades\Storage;
 
 beforeEach(function () {
   Storage::fake();
+  $this->examNo = '1234';
+  // $this->filename = ExamHandler::make()->getFullFilepath($this->examNo);
   $this->testFilePath = Storage::path('exam_test_file.json');
-  $this->realTestFilePath = public_path('exams/test.json');
+  $this->realTestFilePath = ExamHandler::make()->getFullFilepath($this->examNo);
+  $this->examFileContent = [
+    'exam' => [
+      ...Exam::factory()
+        ->started()
+        ->make(['exam_no' => $this->examNo])
+        ->toArray(),
+    ],
+    'attempts' => ['1' => 'A', '2' => 'C'],
+  ];
+  file_put_contents(
+    $this->realTestFilePath,
+    json_encode($this->examFileContent)
+  );
+  // $this->realTestFilePath = public_path('exams/test.json');
+});
+afterEach(function () {
+  @unlink($this->realTestFilePath);
 });
 
 // Test the syncExamFile method
 it('creates or updates an exam file for starting an exam', function () {
   // Arrange: Create a mock Exam object
-  $exam = Exam::factory()->notStarted()->make();
+  $exam = Exam::factory()
+    ->notStarted()
+    ->make(['exam_no' => $this->examNo]);
 
-  // Mock the getContent method to return a successful response
   $handler = Mockery::mock(ExamHandler::class)->makePartial();
   $handler
-    ->shouldReceive('getContent')
+    ->shouldReceive('getExamTrack')
     ->with($exam->exam_no, true)
     ->andReturn(
       ExamProcess::success()
-        ->content([])
+        ->examTrack([])
         ->file($this->testFilePath)
     );
+  /** @var ExamHandler $handler */
   $result = $handler->syncExamFile($exam, true);
 
   // Assert: Check that the result is successful
@@ -38,7 +59,7 @@ it('creates or updates an exam file for starting an exam', function () {
 
 // Test the attemptQuestion method
 it('records a student attempt in the exam file', function () {
-  $examNo = 'exam123';
+  // $examNo = 'exam123';
   $studentAttempts = [
     'question1' => 'answer1',
     'question2' => 'answer2',
@@ -51,11 +72,11 @@ it('records a student attempt in the exam file', function () {
 
   $handler = Mockery::mock(ExamHandler::class)->makePartial();
   $handler
-    ->shouldReceive('getContent')
-    ->with($examNo)
+    ->shouldReceive('getExamTrack')
+    ->with($this->examNo)
     ->andReturn(
       ExamProcess::success()
-        ->content($examFileContent)
+        ->examTrack($examFileContent)
         ->file($this->testFilePath)
     );
 
@@ -70,7 +91,8 @@ it('records a student attempt in the exam file', function () {
     )
     ->andReturnTrue();
 
-  $result = $handler->attemptQuestion($studentAttempts, $examNo);
+  /** @var ExamHandler $handler */
+  $result = $handler->attemptQuestion($studentAttempts, $this->examNo);
 
   expect($result->isSuccessful())
     ->toBeTrue()
@@ -80,19 +102,13 @@ it('records a student attempt in the exam file', function () {
 
 // Test the endExam method
 it('marks the exam as ended', function () {
-  $examNo = 'exam123';
-  $examFileContent = [
-    'exam' => Exam::factory()->make()->toArray(),
-    'attempts' => ['1' => 'A', '2' => 'C'],
-  ];
-
   $handler = Mockery::mock(ExamHandler::class)->makePartial();
   $handler
-    ->shouldReceive('getContent')
-    ->with($examNo, false)
+    ->shouldReceive('getExamTrack')
+    ->with($this->examNo, false)
     ->andReturn(
       ExamProcess::success()
-        ->content($examFileContent)
+        ->examTrack($this->examFileContent)
         ->file($this->testFilePath)
     );
 
@@ -106,7 +122,8 @@ it('marks the exam as ended', function () {
     )
     ->andReturnTrue();
 
-  $result = $handler->endExam($examNo);
+  /** @var ExamHandler $handler */
+  $result = $handler->endExam($this->examNo);
 
   expect($result->isSuccessful())
     ->toBeTrue()
@@ -128,6 +145,7 @@ it('returns time elapsed if exam time is over', function () {
     ->with($this->realTestFilePath)
     ->andReturn(['exam' => $exam->toArray()]);
 
+  /** @var ExamHandler $handler */
   $result = $handler->getContent($exam->exam_no);
 
   expect($result->isNotSuccessful())
@@ -149,6 +167,7 @@ it('returns successful exam content if all conditions are met', function () {
     ->shouldReceive('getExamTrack')
     ->with($this->realTestFilePath)
     ->andReturn(['exam' => $exam->toArray()]);
+  /** @var ExamHandler $handler */
   $result = $handler->getContent($exam->exam_no);
   // dd($exam->toArray());
   // dd($result->toArray());
@@ -156,6 +175,6 @@ it('returns successful exam content if all conditions are met', function () {
     ->toBeTrue()
     ->and($result->getMessage())
     ->toBe('')
-    ->and($result->hasContent())
+    ->and($result->hasExamTrack())
     ->toBeTrue();
 });

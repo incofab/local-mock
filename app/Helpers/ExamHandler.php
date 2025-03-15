@@ -14,9 +14,9 @@ class ExamHandler
   {
   }
 
-  static function make()
+  static function make(): self
   {
-    return new self();
+    return app(ExamHandler::class);
   }
 
   /**
@@ -164,7 +164,7 @@ class ExamHandler
     $examTrackContent = $this->getExamTrack($file);
 
     if (empty($examTrackContent)) {
-      return ExamProcess::fail('Exam file not found')
+      return ExamProcess::fail('Exam file is empty')
         ->examNotFound()
         ->file($file);
     }
