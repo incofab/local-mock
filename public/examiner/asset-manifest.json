@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/cbt/public/examiner/static/css/main.7c75c0a8.css",
-    "main.js": "/cbt/public/examiner/static/js/main.f755cacd.js",
+    "main.js": "/cbt/public/examiner/static/js/main.b015ceb7.js",
     "index.html": "/cbt/public/examiner/index.html",
     "main.7c75c0a8.css.map": "/cbt/public/examiner/static/css/main.7c75c0a8.css.map",
-    "main.f755cacd.js.map": "/cbt/public/examiner/static/js/main.f755cacd.js.map"
+    "main.b015ceb7.js.map": "/cbt/public/examiner/static/js/main.b015ceb7.js.map"
   },
   "entrypoints": [
     "static/css/main.7c75c0a8.css",
-    "static/js/main.f755cacd.js"
+    "static/js/main.b015ceb7.js"
   ]
 }
