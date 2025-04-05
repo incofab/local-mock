@@ -21,7 +21,7 @@ class ExtendExamTime
     $now = now();
     $endTime = $now->greaterThan($this->exam->end_time)
       ? $now
-      : $this->exam->end_time;
+      : $this->exam->end_time ?? $now;
 
     $this->exam
       ->fill([
