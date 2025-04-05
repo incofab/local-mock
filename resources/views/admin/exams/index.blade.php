@@ -3,9 +3,14 @@
 <div>
     <div class="clearfix mb-2">
         <h5 class="float-left">Exams for {{$event->title}}</h5>
-        <a href="{{route('admin.events.evaluate', $event)}}" class="btn btn-primary float-end">
-            <i class="fa fa-reload"></i> Evaluate Results
-        </a>
+        <div class="float-end">
+            <a href="{{route('admin.events.extend-time', $event)}}" class="btn btn-primary">
+                <i class="fa fa-clock"></i> Extend Time
+            </a>
+            <a href="{{route('admin.events.evaluate', $event)}}" class="btn btn-success">
+                <i class="fa fa-reload"></i> Evaluate Results
+            </a>
+        </div>
     </div>
     @include('common.message')
     <div class="table-responsive">

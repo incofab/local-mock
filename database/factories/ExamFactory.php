@@ -43,7 +43,7 @@ class ExamFactory extends Factory
         'start_time' => now()->subHours(2),
         'pause_time' => null,
         'end_time' => now()->subMinutes(30),
-        'active' => ExamStatus::Ended,
+        'status' => ExamStatus::Ended,
       ]
     );
   }
@@ -55,7 +55,7 @@ class ExamFactory extends Factory
         'start_time' => now(),
         'pause_time' => null,
         'end_time' => now()->addMinutes(30),
-        'active' => ExamStatus::Active,
+        'status' => ExamStatus::Active,
       ]
     );
   }

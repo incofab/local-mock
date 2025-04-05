@@ -37,6 +37,9 @@ Route::name('admin.')->middleware('auth', 'verify.institution')->prefix('admin/'
     Route::get('events/{event}/download', [Admin\EventController::class, 'download'])->name('events.download');
     Route::get('events/{event}/evaluate', [Admin\EventController::class, 'evaluateEVent'])->name('events.evaluate');
     Route::get('events/{event}/upload', [Admin\EventController::class, 'uploadEventExams'])->name('events.upload');
+
+    Route::get('events/{event}/extend-time', [Admin\EventController::class, 'extentTimeView'])->name('events.extend-time');
+    Route::post('events/{event}/extend-time', [Admin\EventController::class, 'extentTimeStore'])->name('events.extend-time.store');
     
     Route::get('exams/events/{event}/index', [Admin\ExamController::class, 'index'])->name('exams.index');
     Route::get('exams/{exam}/evaluate', [Admin\ExamController::class, 'evaluateExam'])->name('exams.evaluate');
