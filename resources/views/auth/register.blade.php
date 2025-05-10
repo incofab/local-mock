@@ -76,6 +76,25 @@
                             </div>
                         </div>
 
+                        <div class="form-group row mt-3">
+                            <label for="name" class="col-md-4 col-form-label text-md-right">{{ __('Platform') }}</label>
+                            <div class="col-md-6">
+                                <select name="platform" class="form-control"  required>
+                                    <option value="">Select Platform</option>
+                                    @foreach (\App\Enums\HostPlatform::cases() as $platform)
+                                        <option value="{{$platform->value}}" @selected(old('platform') == $platform->value)>
+                                            {{ucfirst($platform->value)}}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('platform')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                        </div>
+
                         <div class="form-group row mb-0 mt-3">
                             <div class="col-md-8 offset-md-4">
                                 <button type="submit" class="btn btn-primary">

@@ -2,28 +2,20 @@
 namespace App\Support;
 
 use App\Actions\InstitutionHandler;
-use App\Models\Event;
+use App\Support\Platform\PlatformUrl;
 
 class WebsiteHelper
 {
-  private $code;
-  private $baseUrl;
-  // private $institutionUrl;
   private static $instance;
 
-  const LIST_EVENTS = 'events';
-  const SHOW_EVENT = 'events/{event}/show';
-  const SHOW_DEEP_EVENT = 'events/{event}/deep-show';
-  const UPLOAD_EVENT_RESULT = 'events/{event}/upload-result';
-  const LIST_EVENT_EXAMS = 'events/{event}/exams';
-  const SHOW_INSTITUTION = 'show-institution';
-  const UPLOAD_EXAMS = 'exams/upload';
-
+  private PlatformUrl $platformUrl;
   function __construct()
   {
-    $this->baseUrl = config('services.mock-base-url') . 'api/';
-    $this->code = InstitutionHandler::getInstance()->getInstitution()?->code;
-    // $this->institutionUrl = $this->forCode($this->code);
+    $institution = InstitutionHandler::getInstance()->getInstitution();
+    $this->platformUrl = PlatformUrl::make(
+      $institution->platform,
+      $institution->code
+    );
   }
 
   public static function make(): static
@@ -34,54 +26,23 @@ class WebsiteHelper
     return self::$instance;
   }
 
-  static function showInstitutionUrl(string $code)
-  {
-    return config('services.mock-base-url') .
-      'api/' .
-      "institutions/{$code}/" .
-      self::SHOW_INSTITUTION;
-  }
-
-  function url(string $url, array $params = [], $forInstitution = true)
-  {
-    $forInstitution = $forInstitution && $this->code;
-    foreach ($params as $key => $value) {
-      $url = str_ireplace("{{$key}}", $value, $url);
-    }
-    $url =
-      config('services.mock-base-url') .
-      'api/' .
-      ($forInstitution ? "institutions/{$this->code}/" : '') .
-      $url;
-    return $url;
-  }
-
-  // function forCode($code): string
-  // {
-  //   return $this->baseUrl . "institutions/{$code}/";
-  // }
-
-  function getBaseUrl(): string
-  {
-    return $this->baseUrl;
-  }
-
-  function eventContentUrl(Event $event)
-  {
-    return config('services.mock-base-url') . "content/event_{$event->id}.zip";
-  }
-
   function getEvents($latestEventId): array
   {
-    $res = http()->get($this->url(self::LIST_EVENTS), [
+    $res = http()->get($this->platformUrl->listEvents(), [
       'latest_event_id' => $latestEventId,
     ]);
+
     return $res->json('data', []);
   }
 
   function getSingleEvent($eventId): array
   {
-    $res = http()->get($this->url(self::SHOW_EVENT, ['event' => $eventId]));
+    $res = http()->get($this->platformUrl->showEvent($eventId));
+    // dd([
+    //   'data' => $res->json(),
+    //   'url' => $this->platformUrl->showEvent($eventId),
+    //   'eventId' => $eventId,
+    // ]);
     return $res->json('data');
   }
 
@@ -92,15 +53,20 @@ class WebsiteHelper
    */
   function getExams($eventId): array
   {
-    $res = http()->get(
-      $this->url(self::LIST_EVENT_EXAMS, ['event' => $eventId])
-    );
+    $res = http()->get($this->platformUrl->listEventExams($eventId));
+
+    // dd([
+    //   'data' => $res->json(),
+    //   'url' => $this->platformUrl->showEvent($eventId),
+    //   'eventId' => $eventId,
+    // ]);
+
     return $res->json('data', []);
   }
 
   function uploadExams(array $exams): bool
   {
-    $res = http()->post($this->url(self::UPLOAD_EXAMS), ['exams' => $exams]);
+    $res = http()->post($this->platformUrl->uploadExams(), ['exams' => $exams]);
     // info([
     //   'data' => json_encode($exams, JSON_PRETTY_PRINT),
     //   'res' => $res->json(),
@@ -135,9 +101,13 @@ class WebsiteHelper
    */
   function getEventForExam($eventId): array
   {
-    $res = http()->get(
-      $this->url(self::SHOW_DEEP_EVENT, ['event' => $eventId])
-    );
+    $res = http()->get($this->platformUrl->showDeepEvent($eventId));
+    return $res->json('data', []);
+  }
+
+  function deepShowEventByCode($eventCode): array
+  {
+    $res = http()->get($this->platformUrl->deepShowEventByCode($eventCode));
     return $res->json('data', []);
   }
 }

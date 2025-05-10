@@ -1,7 +1,6 @@
 <?php
 namespace App\Actions;
 
-use App\Enums\ExamStatus;
 use App\Models\CourseSession;
 use App\Models\Event;
 use App\Models\Exam;
@@ -40,6 +39,9 @@ class EventExamsHandler
     if (empty($exams)) {
       return failRes('Exam record not found');
     }
+
+    SyncEvents::make()->saveToFile($event, $exams);
+    /*
     if (is_dir($this->filePath->getBaseFolder())) {
       File::deleteDirectory($this->filePath->getBaseFolder());
     }
@@ -49,6 +51,7 @@ class EventExamsHandler
       $event['external_content_id'] ?? false
         ? $event['external_event_courses']
         : $event['event_courses'];
+
     foreach ($eventCourses as $eventCourse) {
       $courseSessionFilename = $this->filePath->courseSessionFilename(
         $eventCourse['course_session_id']
@@ -86,6 +89,7 @@ class EventExamsHandler
       new Event($event),
       $this->filePath->getImagesFolder()
     ))->run();
+    */
     return successRes('Exams downloaded successfully');
   }
 
@@ -148,7 +152,7 @@ class EventExamsHandler
   private function downloadAndUnzipEventContent(Event $event)
   {
     try {
-      $zipUrl = WebsiteHelper::make()->eventContentUrl($event);
+      $zipUrl = ''; // WebsiteHelper::make()->eventContentUrl($event);
       $savePath = storage_path('app/public/sample.zip');
 
       $zipContents = @file_get_contents($zipUrl);

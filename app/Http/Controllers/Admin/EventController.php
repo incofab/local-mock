@@ -8,13 +8,15 @@ use App\Actions\ExtendExamTime;
 use App\Actions\SyncEvents;
 use App\Http\Controllers\Controller;
 use App\Models\Event;
+use App\Support\WebsiteHelper;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class EventController extends Controller
 {
   function index()
   {
-    $query = Event::query()->withCount('exams')->latest();
+    $query = Event::query()->withCount('exams')->latest('id');
     return view('admin.events.index', [
       'records' => paginateFromRequest($query),
     ]);
@@ -22,7 +24,7 @@ class EventController extends Controller
 
   function show(Event $event)
   {
-    // dd(json_encode($event->toArray(), JSON_PRETTY_PRINT));
+    //dd(json_encode($event->toArray(), JSON_PRETTY_PRINT));
     return view('admin.events.show', [
       'event' => $event,
     ]);
@@ -81,6 +83,29 @@ class EventController extends Controller
     return redirect(route('admin.exams.index', $exam->event))->with(
       'message',
       "All exams in this event have been extended by {$request->duration} mins"
+    );
+  }
+
+  function downloadByEventCode(Request $request)
+  {
+    if (!$request->isMethod('POST')) {
+      return view('admin.events.enter-event-code');
+    }
+    $request->validate(['code' => ['required', 'string']]);
+
+    $event = WebsiteHelper::make()->deepShowEventByCode($request->code);
+
+    if (!$event) {
+      return throw ValidationException::withMessages([
+        'code' => 'Event record not found',
+      ]);
+    }
+
+    SyncEvents::make()->saveToFile($event, []);
+
+    return redirect(route('admin.events.show', $event))->with(
+      'message',
+      'Event downloaded successfully'
     );
   }
 }

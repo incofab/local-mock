@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $phone
  * @property string $email
  * @property string $code
+ * @property string $platform
  */
 class Institution extends Model
 {

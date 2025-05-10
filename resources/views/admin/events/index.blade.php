@@ -3,10 +3,15 @@
 <div>
     <div class="clearfix">
         <h2 class="float-start">Events</h2>
-        <a href="{{route('admin.events.sync')}}" class="btn btn-primary float-end"
-            onclick="return confirm('Sync your app with the ')">
-            <i class="fa fa-reload"></i> Sync Events
-        </a>
+        <div class="float-end">
+            <a href="{{route('admin.events.download-by-code')}}" class="btn btn-success">
+                <i class="fa fa-download"></i> Download Event By Code
+            </a>
+            <a href="{{route('admin.events.sync')}}" class="btn btn-primary"
+                onclick="return confirm('Sync your app with the ')">
+                <i class="fa fa-reload"></i> Sync Events
+            </a>
+        </div>
     </div>
     @include('common.message')
     <div class="table-responsive">

@@ -20,7 +20,7 @@ return new class extends Migration {
       $table->unsignedBigInteger('student_id')->nullable();
 
       // $table->unsignedInteger('duration');
-      $table->float('time_remaining');
+      $table->float('time_remaining')->default(0);
 
       $table->dateTime('start_time')->nullable(true);
       $table->dateTime('pause_time')->nullable(true);

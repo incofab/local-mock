@@ -19,3 +19,4 @@ use Illuminate\Support\Facades\Route;
 // });
 
 Route::post('exam/start', [Api\ExamController::class, 'startExam'])->name('start-exam');
+Route::post('exam/create-by-code', [Api\ExamController::class, 'createExamByCode'])->name('exam.create-by-code');

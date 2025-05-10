@@ -2,8 +2,8 @@
 namespace App\Actions;
 
 use App\Models\Institution;
+use App\Support\Platform\PlatformUrl;
 use App\Support\Res;
-use App\Support\WebsiteHelper;
 
 class InstitutionHandler
 {
@@ -54,14 +54,16 @@ class InstitutionHandler
     return $this->institution;
   }
 
-  function processInstitutionCode($code): Res
+  function processInstitutionCode($code, $platform): Res
   {
-    $res = http()->post(WebsiteHelper::showInstitutionUrl($code));
+    $url = PlatformUrl::make($platform, $code)->showInstitution();
+    $res = http()->post($url);
+    // dd($res->json(), $url);
     if (!$res->json('success', false)) {
       return failRes('Error processing request');
     }
     $institution = $res->json('data');
-    $this->save($institution);
+    $this->save([...$institution, 'platform' => $platform]);
     return successRes('Data recorded successfully');
   }
 }

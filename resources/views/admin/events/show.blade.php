@@ -3,7 +3,9 @@
 <div>
     <div>
         <h3>{{$event->title}}</h3>
-        <div>{{$event->description}}</div>
+        <div>Description: {{$event->description}}</div>
+        <div>Code: {{$event->code}}</div>
+        <div>Duration: {{$event->duration}}mins</div>
     </div>
     <br>
     <div>

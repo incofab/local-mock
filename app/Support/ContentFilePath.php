@@ -36,8 +36,12 @@ class ContentFilePath
 
   function createFolders()
   {
-    mkdir($this->examsFolder, 0777, true);
-    mkdir($this->imagesFolder, 0777, true);
+    if (!file_exists($this->examsFolder)) {
+      mkdir($this->examsFolder, 0777, true);
+    }
+    if (!file_exists($this->imagesFolder)) {
+      mkdir($this->imagesFolder, 0777, true);
+    }
   }
 
   public function examFilename($examNo)

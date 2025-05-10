@@ -26,6 +26,7 @@ class Event extends Model
     'description',
     'duration',
     'status',
+    'code',
     'event_courses',
     'external_content_id',
     'external_event_courses',
@@ -39,7 +40,7 @@ class Event extends Model
   {
     return Attribute::make(
       get: function ($value) {
-        $valueArr = json_decode($value, true) ?? [];
+        $valueArr = json_decode($value ?? $this->event_courses, true) ?? [];
         return collect($valueArr)->map(function ($item) {
           return new EventCourse($item);
         });

@@ -30,20 +30,21 @@ class RegistrationController extends Controller
       'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
       'password' => ['required', 'string', 'min:8', 'confirmed'],
       'code' => ['required', 'string'],
+      'platform' => ['required', 'string'],
     ]);
 
-    if (
-      InstitutionHandler::getInstance()
-        ->processInstitutionCode($request->code)
-        ->isNotSuccessful()
-    ) {
+    $res = InstitutionHandler::getInstance()->processInstitutionCode(
+      $request->code,
+      $request->platform
+    );
+    if ($res->isNotSuccessful()) {
       throw ValidationException::withMessages([
         'code' => 'Error processing institution code',
       ]);
     }
 
     $user = User::create([
-      ...collect($data)->except('code')->toArray(),
+      ...collect($data)->except('code', 'platform')->toArray(),
       'password' => Hash::make($data['password']),
     ]);
     Auth::login($user);
