@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Models\Exam;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class ExamController extends Controller
 {
@@ -35,6 +36,26 @@ class ExamController extends Controller
     return redirect(route('admin.exams.index', $exam->event))->with(
       'message',
       "Exam time extended by {$request->duration} mins"
+    );
+  }
+
+  function editExamNo(Exam $exam)
+  {
+    return view('admin.exams.edit-exam-no', ['exam' => $exam]);
+  }
+
+  function updateExamNo(Request $request, Exam $exam)
+  {
+    $data = $request->validate([
+      'exam_no' => [
+        'required',
+        Rule::unique('exams', 'exam_no')->ignore($exam->id),
+      ],
+    ]);
+    $exam->fill($data)->save();
+    return redirect(route('admin.exams.index', $exam->event_id))->with(
+      'message',
+      'Exam number updated successfully'
     );
   }
 }

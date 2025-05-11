@@ -24,6 +24,7 @@
                     <th>Subjects</th>
                     <th>End Time</th>
                     <th>Questions</th>
+                    <th>Uploaded</th>
                     <th>Date</th>
                     <th></th>
                 </tr>
@@ -39,13 +40,22 @@
                 $isOngoing = $record->isOngoing($examFileData);
                 ?>
                 <tr data-end_time="{{$isOngoing ? $record->end_time : ''}}">
-                    <td>{{$record->exam_no}}</td>
+                    <td>{{$record->exam_no}} <a href="{{route('admin.exams.exam-no.edit', [$record])}}"><i class="fa fa-pencil"></i></a></td>
                     <td>{{$record->student->name}}</td>
                     <td>{{$record->status}}</td>
                     <td>{{$record->score}}</td>
                     <td><small>{{$record->exam_courses->map(fn($item) => "{$item->course_code}")->join(', ')}}</small></td>
                     <td class="end-time"></td>
                     <td>{{$record->num_of_questions}}</td>
+                    <td class="text-center">
+                        @if ($record->uploaded_at)
+                            <div><i class="fa fa-check text-success"></i></div>
+                        @endif
+                        <div>
+                            <i class="fa fa-times text-danger"></i> 
+                            <small>{{$record->upload_message}}</small>
+                        </div>
+                    </td>
                     <td><small>{{$record->created_at}}</small></td>
                     <td>
                         @if($record->canExtendTime())

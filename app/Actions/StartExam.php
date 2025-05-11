@@ -9,8 +9,10 @@ use App\Models\Question;
 
 class StartExam
 {
+  private EventExamsHandler $eventExamHandler;
   function __construct(private Exam $exam)
   {
+    $this->eventExamHandler = new EventExamsHandler($exam->event);
   }
 
   static function make(Exam $exam)
@@ -20,6 +22,9 @@ class StartExam
 
   function getExamStartupData($start = true)
   {
+    if (!$this->eventExamHandler->isDownloaded()) {
+      return failRes('This event has not been downloaded. Contact admin');
+    }
     if ($start && $this->canStartExam()) {
       $this->exam->markAsStarted();
     }
@@ -47,10 +52,10 @@ class StartExam
 
   private function prepareExam(Exam $exam)
   {
-    $eventExamHandler = new EventExamsHandler($exam->event);
+    // $eventExamHandler = new EventExamsHandler($exam->event);
     /** @var ExamCourse $examCourse */
     foreach ($exam->exam_courses as $key => $examCourse) {
-      $courseSession = $eventExamHandler->getCourseSession(
+      $courseSession = $this->eventExamHandler->getCourseSession(
         $examCourse->course_session_id
       );
       $courseSession->questions = $courseSession->questions->map(function (

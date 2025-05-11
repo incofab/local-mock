@@ -12,6 +12,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $course_session_id
  * @property int $num_of_questions
  * @property int $score
+ * @property ?string $course_code
+ * @property ?string $session
  * @property Exam $exam
  * @property CourseSession $course_session
  */

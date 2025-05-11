@@ -47,6 +47,8 @@ Route::name('admin.')->middleware('auth', 'verify.institution')->prefix('admin/'
     Route::get('exams/{exam}/evaluate', [Admin\ExamController::class, 'evaluateExam'])->name('exams.evaluate');
     Route::get('exams/{exam}/extend-time', [Admin\ExamController::class, 'extentTimeView'])->name('exams.extend-time');
     Route::post('exams/{exam}/extend-time', [Admin\ExamController::class, 'extentTimeStore'])->name('exams.extend-time.store');
+    Route::get('exams/{exam}/exam-no/edit', [Admin\ExamController::class, 'editExamNo'])->name('exams.exam-no.edit');
+    Route::post('exams/{exam}/exam-no/update', [Admin\ExamController::class, 'updateExamNo'])->name('exams.exam-no.update');
 });
 
 Route::get('/reset-exam/{exam:exam_no}', function (\App\Models\Exam $exam) {

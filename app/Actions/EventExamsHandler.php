@@ -142,7 +142,24 @@ class EventExamsHandler
       ->exams()
       ->getQuery()
       ->chunk(100, function ($exams) {
-        $success = WebsiteHelper::make()->uploadExams($exams->toArray());
+        [$uploaded, $failedUploads] = WebsiteHelper::make()->uploadExams(
+          $exams->toArray()
+        );
+        foreach ($uploaded as $key => $value) {
+          Exam::query()
+            ->where('exam_no', $value['exam_no'])
+            ->update([
+              'uploaded_at' => now(),
+              'upload_message' => $value['message'],
+            ]);
+        }
+        foreach ($failedUploads as $key => $value) {
+          Exam::query()
+            ->where('exam_no', $value['exam_no'])
+            ->update([
+              'upload_message' => $value['message'],
+            ]);
+        }
       });
     $this->event->fill(['uploaded_at' => now()])->save();
     return successRes('Event exams uploaded');

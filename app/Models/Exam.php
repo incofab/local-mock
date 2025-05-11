@@ -31,6 +31,7 @@ class Exam extends Model
     'start_time' => 'datetime',
     'end_time' => 'datetime',
     'pause_time' => 'datetime',
+    'uploaded_at' => 'datetime',
   ];
   protected $fillable = [
     'id',
@@ -48,6 +49,8 @@ class Exam extends Model
     'attempts',
     'student',
     'exam_courses',
+    'uploaded_at',
+    'upload_message',
   ];
 
   function examCourses(): Attribute

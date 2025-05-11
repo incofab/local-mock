@@ -64,7 +64,7 @@ class WebsiteHelper
     return $res->json('data', []);
   }
 
-  function uploadExams(array $exams): bool
+  function uploadExams(array $exams): array
   {
     $res = http()->post($this->platformUrl->uploadExams(), ['exams' => $exams]);
     // info([
@@ -72,7 +72,9 @@ class WebsiteHelper
     //   'res' => $res->json(),
     //   'url' => $this->url(self::UPLOAD_EXAMS),
     // ]);
-    return $res->ok();
+    $success = $res->json('data.uploaded', []);
+    $failed = $res->json('data.failed_uploads', []);
+    return [$success, $failed];
   }
 
   /**

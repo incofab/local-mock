@@ -19,6 +19,7 @@
             <thead>
                 <tr>
                     <th>Title</th>
+                    <th>Code</th>
                     <th>Subjects</th>
                     <th>Duration (mins)</th>
                     <th>Exams</th>
@@ -28,8 +29,17 @@
             </thead>
             <tbody>
                 @foreach ($records as $record)
+                <?php $eventExamHandler = new \App\Actions\EventExamsHandler(
+                  $record
+                ); ?>
                 <tr>
-                    <td><a href="{{route('admin.events.show', $record)}}">{{$record->title}}</a></td>
+                    <td>
+                        <a href="{{route('admin.events.show', $record)}}" 
+                            class="{{$eventExamHandler->isDownloaded() ? '' : 'text-muted'}}">
+                            {{$record->title}}
+                        </a>
+                    </td>
+                    <td>{{$record->code}}</td>
                     <td>{{$record->getEventCourses()->count()}}</td>
                     <td>{{$record->duration}}</td>
                     <td>{{$record->exams_count}}</td>
