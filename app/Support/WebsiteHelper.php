@@ -31,7 +31,6 @@ class WebsiteHelper
     $res = http()->get($this->platformUrl->listEvents(), [
       'latest_event_id' => $latestEventId,
     ]);
-
     return $res->json('data', []);
   }
 
