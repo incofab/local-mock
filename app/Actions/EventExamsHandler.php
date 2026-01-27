@@ -36,11 +36,11 @@ class EventExamsHandler
     if (!$event) {
       return failRes('Event record not found');
     }
-    if (empty($exams)) {
-      return failRes('Exam record not found');
-    }
+    // if (empty($exams)) {
+    //   return failRes('Exam record not found');
+    // }
 
-    SyncEvents::make()->saveToFile($event, $exams);
+    SyncEvents::make()->saveToFile($event, $exams ?? []);
     /*
     if (is_dir($this->filePath->getBaseFolder())) {
       File::deleteDirectory($this->filePath->getBaseFolder());

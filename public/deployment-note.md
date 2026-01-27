@@ -15,3 +15,6 @@
 # Run a fresh migration `php artisan migrate:fresh`
 
 # Delete the `public/institution_data.json` if it exists
+
+bootstrap5.3 and fontawesome-6.7 to be added manually to the
+`C:\xampp\htdocs\cbt\public\examiner\lib` folder
