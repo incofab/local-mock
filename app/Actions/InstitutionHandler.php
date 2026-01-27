@@ -30,6 +30,14 @@ class InstitutionHandler
     file_put_contents($this->filename, json_encode($data, JSON_PRETTY_PRINT));
   }
 
+  /** Only called when resetting the app */
+  function deleteFile()
+  {
+    if (file_exists($this->filename)) {
+      unlink($this->filename);
+    }
+  }
+
   function isRecorded(): bool
   {
     return file_exists($this->filename);
