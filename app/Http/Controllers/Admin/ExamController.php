@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Actions\EndExam;
 use App\Actions\ExtendExamTime;
+use App\Helpers\ExamHandler;
 use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Models\Exam;
@@ -56,6 +57,16 @@ class ExamController extends Controller
     return redirect(route('admin.exams.index', $exam->event_id))->with(
       'message',
       'Exam number updated successfully'
+    );
+  }
+
+  function deleteExam(Exam $exam)
+  {
+    ExamHandler::make()->deleteFile($exam->exam_no);
+    $exam->delete();
+    return redirect(route('admin.exams.index', $exam->event))->with(
+      'message',
+      'Exam deleted successfully'
     );
   }
 }

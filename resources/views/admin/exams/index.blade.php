@@ -68,6 +68,9 @@
                             <i class="fa fa-reload"></i> {{($record->score == null) ? 'Evaluate' : 'Re-Evaluate'}}
                         </a>
                         @endif
+                        <a href="{{route('admin.exams.delete', $record)}}" class="btn btn-danger btn-sm mt-2" onclick="return confirm('Do you want to delete this exam?')">
+                            <i class="fa fa-trash"></i> Delete
+                        </a>
                     </td>
                 </tr>
                 @endforeach

@@ -116,6 +116,14 @@ class ExamHandler
     );
   }
 
+  function deleteFile($examNo)
+  {
+    $file = $this->getFullFilepath($examNo);
+    if (file_exists($file)) {
+      unlink($file);
+    }
+  }
+
   /**
    * @param Collection<int, \App\Models\Question> $questions
    */
