@@ -16,7 +16,11 @@ return new class extends Migration {
     return;
     Schema::create('exam_courses', function (Blueprint $table) {
       $table->id();
-      $table->foreignId('exam_id')->references('id')->on('exams');
+      $table
+        ->foreignId('exam_id')
+        ->references('id')
+        ->on('exams')
+        ->cascadeOnDelete();
       $table->unsignedBigInteger('course_session_id');
       $table->unsignedInteger('score')->nullable(true);
       $table->unsignedInteger('num_of_questions')->nullable(true);
