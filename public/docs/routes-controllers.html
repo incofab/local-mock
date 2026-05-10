@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Routes and Controllers - Local Mock Docs</title>
+  <link rel="stylesheet" href="docs.css">
+</head>
+<body>
+  <header>
+    <h1>Routes and Controllers</h1>
+    <p>HTTP surface area and controller responsibilities.</p>
+  </header>
+
+  <div class="layout">
+    <nav>
+      <h2>Docs Pages</h2>
+      <a href="index.html">Overview</a>
+      <a href="architecture.html">Architecture</a>
+      <a href="workflows.html">Workflows</a>
+      <a href="routes-controllers.html">Routes and Controllers</a>
+      <a href="domain-logic.html">Domain Logic</a>
+      <a href="data-storage.html">Data and Storage</a>
+      <a href="frontend-public.html">Frontend and Public Scripts</a>
+      <a href="testing-operations.html">Testing and Operations</a>
+      <a href="ai-change-guide.html">AI Change Guide</a>
+    </nav>
+
+    <main>
+      <section>
+        <h2>Web Routes</h2>
+        <table>
+          <thead><tr><th>Route</th><th>Name</th><th>Handler</th><th>Behavior</th></tr></thead>
+          <tbody>
+            <tr><td><code>GET /</code></td><td>-</td><td>Closure</td><td>Redirects to admin dashboard.</td></tr>
+            <tr><td><code>ANY /logout</code></td><td><code>logout</code></td><td><code>LoginController::logout</code></td><td>Logs out authenticated user.</td></tr>
+            <tr><td><code>GET /login</code></td><td><code>login</code></td><td><code>LoginController::create</code></td><td>Shows login or redirects to registration if institution setup is missing.</td></tr>
+            <tr><td><code>POST /login</code></td><td>-</td><td><code>LoginController::store</code></td><td>Authenticates email/password.</td></tr>
+            <tr><td><code>GET /register</code></td><td><code>register</code></td><td><code>RegistrationController::create</code></td><td>Shows registration and institution setup form.</td></tr>
+            <tr><td><code>POST /register</code></td><td>-</td><td><code>RegistrationController::store</code></td><td>Registers institution and first user.</td></tr>
+            <tr><td><code>GET /admin</code></td><td><code>admin.dashboard</code></td><td><code>AdminController::index</code></td><td>Admin dashboard.</td></tr>
+            <tr><td><code>GET /admin/events</code></td><td><code>admin.events.index</code></td><td><code>EventController::index</code></td><td>Paginated events with exam counts.</td></tr>
+            <tr><td><code>GET /admin/events/sync</code></td><td><code>admin.events.sync</code></td><td><code>EventController::syncEvents</code></td><td>Fetches new remote events.</td></tr>
+            <tr><td><code>GET /admin/events/{event}/show</code></td><td><code>admin.events.show</code></td><td><code>EventController::show</code></td><td>Shows event details.</td></tr>
+            <tr><td><code>GET /admin/events/{event}/refresh</code></td><td><code>admin.events.refresh</code></td><td><code>EventController::refreshEvent</code></td><td>Refreshes one event from remote platform.</td></tr>
+            <tr><td><code>GET /admin/events/{event}/download</code></td><td><code>admin.events.download</code></td><td><code>EventController::download</code></td><td>Downloads event content and exams.</td></tr>
+            <tr><td><code>GET /admin/events/{event}/evaluate</code></td><td><code>admin.events.evaluate</code></td><td><code>EventController::evaluateEVent</code></td><td>Evaluates all exams in an event.</td></tr>
+            <tr><td><code>GET /admin/events/{event}/upload</code></td><td><code>admin.events.upload</code></td><td><code>EventController::uploadEventExams</code></td><td>Uploads event exam results.</td></tr>
+            <tr><td><code>GET|POST /admin/events/{event}/extend-time</code></td><td><code>admin.events.extend-time*</code></td><td><code>EventController::extentTimeView/Store</code></td><td>Form and submit for event-wide extension.</td></tr>
+            <tr><td><code>ANY /admin/events/download-by-code</code></td><td><code>admin.events.download-by-code</code></td><td><code>EventController::downloadByEventCode</code></td><td>Downloads deep event content by code.</td></tr>
+            <tr><td><code>GET /admin/exams/events/{event}/index</code></td><td><code>admin.exams.index</code></td><td><code>ExamController::index</code></td><td>Lists exams for event.</td></tr>
+            <tr><td><code>GET /admin/exams/{exam}/evaluate</code></td><td><code>admin.exams.evaluate</code></td><td><code>ExamController::evaluateExam</code></td><td>Evaluates one exam.</td></tr>
+            <tr><td><code>GET|POST /admin/exams/{exam}/extend-time</code></td><td><code>admin.exams.extend-time*</code></td><td><code>ExamController::extentTimeView/Store</code></td><td>Form and submit for one exam extension.</td></tr>
+            <tr><td><code>GET|POST /admin/exams/{exam}/exam-no/*</code></td><td><code>admin.exams.exam-no.*</code></td><td><code>ExamController::editExamNo/updateExamNo</code></td><td>Corrects an exam number.</td></tr>
+            <tr><td><code>GET /admin/exams/{exam}/delete</code></td><td><code>admin.exams.delete</code></td><td><code>ExamController::deleteExam</code></td><td>Deletes DB record and local <code>.edr</code> file.</td></tr>
+            <tr><td><code>GET /reset-exam/{exam:exam_no}</code></td><td>-</td><td>Closure</td><td>Restarts an exam by exam number.</td></tr>
+          </tbody>
+        </table>
+        <p>
+          Admin routes use <code>auth</code> and <code>verify.institution</code>.
+          Guest auth routes are grouped under <code>guest</code>.
+        </p>
+      </section>
+
+      <section>
+        <h2>API Routes</h2>
+        <table>
+          <thead><tr><th>Route</th><th>Name</th><th>Handler</th><th>Behavior</th></tr></thead>
+          <tbody>
+            <tr><td><code>POST /api/exam/start</code></td><td><code>api.start-exam</code></td><td><code>API\ExamController::startExam</code></td><td>Starts or resumes an exam and returns exam payload, tracking data, remaining time, and base URL.</td></tr>
+            <tr><td><code>POST /api/exam/create-by-code</code></td><td><code>api.exam.create-by-code</code></td><td><code>API\ExamController::createExamByCode</code></td><td>Creates or reuses an exam for a student using event code.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2>Controllers</h2>
+        <table>
+          <thead><tr><th>Controller</th><th>Methods</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td><code>Controller</code></td><td><code>ok()</code>, <code>fail()</code></td><td>Base JSON helpers. <code>fail()</code> returns HTTP 401.</td></tr>
+            <tr><td><code>Admin\AdminController</code></td><td><code>index()</code></td><td>Returns <code>admin.index</code>.</td></tr>
+            <tr><td><code>Admin\EventController</code></td><td><code>index</code>, <code>show</code>, <code>syncEvents</code>, <code>refreshEvent</code>, <code>evaluateEVent</code>, <code>download</code>, <code>uploadEventExams</code>, <code>extentTimeView</code>, <code>extentTimeStore</code>, <code>downloadByEventCode</code></td><td>Main admin event controller; delegates to actions and helpers.</td></tr>
+            <tr><td><code>Admin\ExamController</code></td><td><code>index</code>, <code>evaluateExam</code>, <code>extentTimeView</code>, <code>extentTimeStore</code>, <code>editExamNo</code>, <code>updateExamNo</code>, <code>deleteExam</code></td><td>Admin exam list and per-exam operations.</td></tr>
+            <tr><td><code>API\ExamController</code></td><td><code>startExam</code>, private <code>examView</code>, <code>createExamByCode</code>, private <code>createExam</code></td><td>Examiner client JSON API. Validation failures return 422; domain failures use base <code>fail()</code>.</td></tr>
+            <tr><td><code>Auth\LoginController</code></td><td><code>create</code>, <code>store</code>, <code>logout</code></td><td>Login flow and session invalidation.</td></tr>
+            <tr><td><code>Auth\RegistrationController</code></td><td><code>create</code>, protected <code>store</code></td><td>Institution setup, user creation, and login.</td></tr>
+            <tr><td><code>Home\HomeController</code></td><td>none active</td><td>Placeholder with commented methods.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2>Middleware</h2>
+        <p>
+          <code>VerifyInstitution</code> checks for recorded institution data
+          before admin pages. If missing, it redirects to registration. On GET
+          requests, it shares <code>$institution</code> with views. The alias is
+          registered as <code>verify.institution</code> in
+          <code>app/Http/Kernel.php</code>.
+        </p>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

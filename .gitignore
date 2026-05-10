@@ -19,3 +19,4 @@ yarn-error.log
 /.vscode
 /public/institution-data.json
 *.zip
+dummy.txt

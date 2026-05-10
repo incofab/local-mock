@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Change Guide - Local Mock Docs</title>
+  <link rel="stylesheet" href="docs.css">
+</head>
+<body>
+  <header>
+    <h1>AI Change Guide</h1>
+    <p>Rules for future AI CLIs changing this repository.</p>
+  </header>
+
+  <div class="layout">
+    <nav>
+      <h2>Docs Pages</h2>
+      <a href="index.html">Overview</a>
+      <a href="architecture.html">Architecture</a>
+      <a href="workflows.html">Workflows</a>
+      <a href="routes-controllers.html">Routes and Controllers</a>
+      <a href="domain-logic.html">Domain Logic</a>
+      <a href="data-storage.html">Data and Storage</a>
+      <a href="frontend-public.html">Frontend and Public Scripts</a>
+      <a href="testing-operations.html">Testing and Operations</a>
+      <a href="ai-change-guide.html">AI Change Guide</a>
+    </nav>
+
+    <main>
+      <section>
+        <h2>Required Reading</h2>
+        <ol>
+          <li>Start with <code>public/docs/index.html</code>.</li>
+          <li>Open the focused docs page for the area you are changing.</li>
+          <li>Inspect the actual code before editing; the docs are a map, not a substitute for source verification.</li>
+        </ol>
+      </section>
+
+      <section>
+        <h2>Documentation Maintenance Rule</h2>
+        <p>
+          When changing routes, controllers, actions, helpers, support classes,
+          models, migrations, views, public examiner scripts, tests, commands,
+          runtime storage behavior, or file formats, update the relevant page in
+          <code>public/docs</code> in the same change.
+        </p>
+        <p>
+          If a new subsystem is added, create a new focused docs page and link
+          it from <code>public/docs/index.html</code> and the navigation block
+          used by the other docs pages.
+        </p>
+      </section>
+
+      <section>
+        <h2>High-risk Areas</h2>
+        <ul>
+          <li>Do not assume <code>event_courses</code> or <code>exam_courses</code> are normalized relationships; they are JSON-backed in current behavior.</li>
+          <li>Preserve the distinction between downloaded content files in <code>public/content</code> and live attempt tracking files in <code>public/exams</code>.</li>
+          <li>Be careful with <code>SyncEvents::saveToFile()</code>; it deletes and recreates an event content folder.</li>
+          <li>Be careful with raw scripts in <code>public/exam-route</code>; they do not use the Laravel kernel.</li>
+          <li>When changing exam status logic, review <code>Exam</code>, <code>StartExam</code>, <code>EndExam</code>, <code>ExtendExamTime</code>, <code>ExamHandler</code>, admin views, and tests.</li>
+          <li>When changing remote platform integration, update <code>WebsiteHelper</code>, <code>PlatformUrl</code> implementations, tests/fakes, and these docs.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>File Index</h2>
+        <table>
+          <thead><tr><th>Path</th><th>Meaning</th></tr></thead>
+          <tbody>
+            <tr><td><code>app/Actions</code></td><td>Domain application services.</td></tr>
+            <tr><td><code>app/Console/Commands</code></td><td>Operational commands for reset and password reset.</td></tr>
+            <tr><td><code>app/Enums</code></td><td>Exam statuses and host platform identifiers.</td></tr>
+            <tr><td><code>app/Helpers/ExamHandler.php</code></td><td>Local exam tracking file manager and scorer.</td></tr>
+            <tr><td><code>app/Http/Controllers</code></td><td>Auth, admin, API, and base controllers.</td></tr>
+            <tr><td><code>app/Http/Middleware/VerifyInstitution.php</code></td><td>Requires institution data for admin routes and shares institution with GET views.</td></tr>
+            <tr><td><code>app/Models</code></td><td>Eloquent models and JSON-backed domain wrappers.</td></tr>
+            <tr><td><code>app/Support</code></td><td>Path, response, platform URL, HTTP integration, and exam process support objects.</td></tr>
+            <tr><td><code>app/helpers.php</code></td><td>Global helpers autoloaded by Composer.</td></tr>
+            <tr><td><code>database/migrations</code></td><td>Schema for users, events, exams, and standard Laravel tables.</td></tr>
+            <tr><td><code>database/factories</code></td><td>Test data factories.</td></tr>
+            <tr><td><code>public/docs</code></td><td>This documentation site. Keep it current.</td></tr>
+            <tr><td><code>public/exam-route</code></td><td>Raw PHP endpoints used by examiner client.</td></tr>
+            <tr><td><code>public/examiner</code></td><td>Static examiner frontend build.</td></tr>
+            <tr><td><code>public/content</code></td><td>Downloaded event content and images.</td></tr>
+            <tr><td><code>public/exams</code></td><td>Live exam tracking files.</td></tr>
+            <tr><td><code>resources/views</code></td><td>Blade admin/auth/common views.</td></tr>
+            <tr><td><code>routes/web.php</code>, <code>routes/api.php</code></td><td>Web and API routes.</td></tr>
+            <tr><td><code>tests</code></td><td>Pest test suite.</td></tr>
+          </tbody>
+        </table>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

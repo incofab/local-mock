@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Domain Logic - Local Mock Docs</title>
+  <link rel="stylesheet" href="docs.css">
+</head>
+<body>
+  <header>
+    <h1>Domain Logic</h1>
+    <p>Actions, helpers, support classes, platform integration, and global helpers.</p>
+  </header>
+
+  <div class="layout">
+    <nav>
+      <h2>Docs Pages</h2>
+      <a href="index.html">Overview</a>
+      <a href="architecture.html">Architecture</a>
+      <a href="workflows.html">Workflows</a>
+      <a href="routes-controllers.html">Routes and Controllers</a>
+      <a href="domain-logic.html">Domain Logic</a>
+      <a href="data-storage.html">Data and Storage</a>
+      <a href="frontend-public.html">Frontend and Public Scripts</a>
+      <a href="testing-operations.html">Testing and Operations</a>
+      <a href="ai-change-guide.html">AI Change Guide</a>
+    </nav>
+
+    <main>
+      <section>
+        <h2>Actions</h2>
+        <table>
+          <thead><tr><th>Action</th><th>Methods</th><th>Behavior</th></tr></thead>
+          <tbody>
+            <tr><td><code>InstitutionHandler</code></td><td><code>getInstance</code>, <code>save</code>, <code>deleteFile</code>, <code>isRecorded</code>, <code>getInstitution</code>, <code>processInstitutionCode</code></td><td>Singleton manager for <code>public/institution-data.json</code>. Converts stored institution array into an <code>Institution</code> model.</td></tr>
+            <tr><td><code>SyncEvents</code></td><td><code>make</code>, <code>all</code>, <code>single</code>, <code>saveToFile</code></td><td>Syncs event records from remote and writes event content, course session JSON, exam JSON, and images to <code>public/content</code>.</td></tr>
+            <tr><td><code>EventExamsHandler</code></td><td><code>isDownloaded</code>, <code>downloadEventContent</code>, <code>getCourseSession</code>, <code>getQuestions</code>, <code>listExams</code>, <code>getExam</code>, <code>uploadEventExams</code></td><td>Event-local facade around content files and result upload. Current download writing delegates to <code>SyncEvents::saveToFile()</code>.</td></tr>
+            <tr><td><code>StartExam</code></td><td><code>make</code>, <code>getExamStartupData</code>, <code>canStartExam</code>, private <code>prepareExam</code></td><td>Starts pending/paused exams, syncs tracking file, loads course sessions, strips answers, and returns startup payload.</td></tr>
+            <tr><td><code>EndExam</code></td><td><code>make</code>, <code>endEventExams</code>, <code>endExam</code></td><td>Scores active exams from local attempts. Refuses ended and non-active exams.</td></tr>
+            <tr><td><code>ExtendExamTime</code></td><td><code>make</code>, <code>run</code></td><td>Reactivates exam, extends <code>end_time</code>, clears pause time, and syncs tracking file.</td></tr>
+            <tr><td><code>CompileEventImages</code></td><td><code>make</code>, <code>run</code>, private image helpers</td><td>Extracts image URLs from question, option, and answer metadata HTML and stores local image copies.</td></tr>
+            <tr><td><code>FakeData</code></td><td><code>run</code> and private HTTP fake builders</td><td>Registers HTTP fakes for tests using JSON payloads in <code>public/sample-data</code>.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2><code>ExamHandler</code></h2>
+        <table>
+          <thead><tr><th>Method</th><th>Details</th></tr></thead>
+          <tbody>
+            <tr><td><code>syncExamFile(Exam $exam, $forStart = true)</code></td><td>Creates or updates <code>public/exams/exam_{exam_no}.edr</code>. During start, a missing file is acceptable; other read errors fail.</td></tr>
+            <tr><td><code>attemptQuestion(array $studentAttempts, $examNo)</code></td><td>Merges attempts by question id into the existing tracking file.</td></tr>
+            <tr><td><code>endExam($examNo)</code></td><td>Marks only the file's embedded exam payload as ended. Database scoring is handled by <code>EndExam</code>.</td></tr>
+            <tr><td><code>saveFile($filename, $content)</code></td><td>Writes pretty JSON. Kept public for tests/mocking.</td></tr>
+            <tr><td><code>deleteFile($examNo)</code></td><td>Deletes local <code>.edr</code> tracking file.</td></tr>
+            <tr><td><code>calculateScoreFromFile(Exam $exam, $questions)</code></td><td>Counts questions where saved attempt exactly equals <code>Question::answer</code>.</td></tr>
+            <tr><td><code>getFullFilepath($examNo)</code></td><td>Returns <code>public/exams/exam_{examNo}.edr</code>.</td></tr>
+            <tr><td><code>getContent($examNo, $checkTime = true)</code></td><td>Loads tracking file. With time checks enabled, fails if current time is after embedded <code>end_time</code> or embedded status is <code>ended</code>.</td></tr>
+            <tr><td><code>getExamTrack($file)</code></td><td>JSON-decodes tracking file.</td></tr>
+            <tr><td><code>getExamFileData($examNo)</code></td><td>Returns only embedded <code>exam</code> data from tracking file.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2>Support Classes</h2>
+        <table>
+          <thead><tr><th>Class</th><th>Purpose</th></tr></thead>
+          <tbody>
+            <tr><td><code>ContentFilePath</code></td><td>Builds paths under <code>public/content/event_{id}</code>: base folder, <code>images/</code>, <code>exams/</code>, <code>exam_{exam_no}.json</code>, and <code>course_session_{id}.json</code>.</td></tr>
+            <tr><td><code>ExamProcess</code></td><td>Fluent result object for exam file operations. Carries success, message, file path, exam track, time elapsed flag, exam-not-found flag, score, and question count.</td></tr>
+            <tr><td><code>Res</code></td><td>ArrayObject-style result wrapper used by actions and global <code>successRes()</code>/<code>failRes()</code>.</td></tr>
+            <tr><td><code>WebsiteHelper</code></td><td>Remote platform client. Uses institution data to create a <code>PlatformUrl</code> and exposes event list/show/deep-show, exam list, upload, and deep-show-by-code calls.</td></tr>
+            <tr><td><code>PlatformUrl</code></td><td>Abstract URL contract and factory. Chooses <code>EdumanagerUrl</code> or <code>MockExamscholarsUrl</code>.</td></tr>
+            <tr><td><code>EdumanagerUrl</code></td><td>Builds URLs under <code>https://edumanager.ng/api/offline-mock/institutions/{code}/</code>.</td></tr>
+            <tr><td><code>MockExamscholarsUrl</code></td><td>Builds URLs under <code>https://mock.examscholars.com/api/institutions/{code}/</code>.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2>Global Helpers</h2>
+        <p>
+          <code>app/helpers.php</code> is autoloaded by Composer. It provides
+          <code>currentUser()</code>, <code>randomDigits()</code>,
+          <code>pageTitle()</code>, <code>addSpacing()</code>,
+          <code>successRes()</code>, <code>failRes()</code>, form error HTML,
+          JSON debug helpers <code>je()</code>/<code>dlog()</code>,
+          <code>paginateFromRequest()</code>, <code>currentInstitution()</code>,
+          and <code>http()</code>.
+        </p>
+        <div class="warning">
+          <code>http()</code> disables SSL verification with
+          <code>withOptions(['verify' =&gt; false])</code>. Preserve this only
+          if the deployment environment requires it.
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Local Mock Technical Documentation</title>
+  <link rel="stylesheet" href="docs.css">
+</head>
+<body>
+  <header>
+    <h1>Local Mock Technical Documentation</h1>
+    <p>
+      Entry point for AI agents and developers working on this Laravel offline
+      mock exam application. Start here, then open the focused page for the area
+      you are changing.
+    </p>
+  </header>
+
+  <div class="layout">
+    <nav aria-label="Documentation pages">
+      <h2>Docs Pages</h2>
+      <a href="index.html">Overview</a>
+      <a href="architecture.html">Architecture</a>
+      <a href="workflows.html">Workflows</a>
+      <a href="routes-controllers.html">Routes and Controllers</a>
+      <a href="domain-logic.html">Domain Logic</a>
+      <a href="data-storage.html">Data and Storage</a>
+      <a href="frontend-public.html">Frontend and Public Scripts</a>
+      <a href="testing-operations.html">Testing and Operations</a>
+      <a href="ai-change-guide.html">AI Change Guide</a>
+    </nav>
+
+    <main>
+      <section>
+        <h2>Purpose</h2>
+        <p>
+          This project is an offline/local mock exam management system. It
+          registers an institution, syncs events from a remote platform,
+          downloads event content, creates and starts exams, tracks attempts in
+          local files, evaluates scores, and uploads completed exam results.
+        </p>
+        <p>
+          The stack is Laravel 10, PHP 8.1+, Blade admin screens, Pest tests,
+          Vite scaffolding, and a bundled static examiner client with raw PHP
+          endpoints under <code>public/exam-route</code>.
+        </p>
+        <div class="note">
+          Core concepts: <span class="pill">Institution</span>
+          <span class="pill">Event</span>
+          <span class="pill">Course Session</span>
+          <span class="pill">Exam</span>
+          <span class="pill">Exam Course</span>
+          <span class="pill">Question</span>
+          <span class="pill">Attempt</span>
+        </div>
+      </section>
+
+      <section>
+        <h2>Documentation Map</h2>
+        <div class="cards">
+          <a class="card" href="architecture.html">
+            <strong>Architecture</strong>
+            Project layers, important directories, runtime design choices, and
+            how the Laravel app relates to the public examiner client.
+          </a>
+          <a class="card" href="workflows.html">
+            <strong>Workflows</strong>
+            Step-by-step behavior for institution setup, sync, download, exam
+            creation, start, attempts, evaluation, extension, and upload.
+          </a>
+          <a class="card" href="routes-controllers.html">
+            <strong>Routes and Controllers</strong>
+            Web/API route tables and controller method responsibilities.
+          </a>
+          <a class="card" href="domain-logic.html">
+            <strong>Domain Logic</strong>
+            Actions, helpers, support classes, platform integration, and global
+            helper functions.
+          </a>
+          <a class="card" href="data-storage.html">
+            <strong>Data and Storage</strong>
+            Models, enums, migrations, JSON-backed attributes, content folders,
+            exam tracking files, and runtime persistence.
+          </a>
+          <a class="card" href="frontend-public.html">
+            <strong>Frontend and Public Scripts</strong>
+            Blade views, admin UI, static examiner client, and raw PHP scripts.
+          </a>
+          <a class="card" href="testing-operations.html">
+            <strong>Testing and Operations</strong>
+            Commands, dependencies, tests, factories, and local development.
+          </a>
+          <a class="card" href="ai-change-guide.html">
+            <strong>AI Change Guide</strong>
+            Rules future AI CLIs must follow when changing the system and when
+            updating these docs.
+          </a>
+        </div>
+      </section>
+
+      <section>
+        <h2>Quick System Summary</h2>
+        <ol>
+          <li><code>InstitutionHandler</code> stores local institution setup in <code>public/institution-data.json</code>.</li>
+          <li><code>WebsiteHelper</code> and <code>PlatformUrl</code> fetch events, event content, exams, and upload results.</li>
+          <li><code>SyncEvents</code> and <code>EventExamsHandler</code> download event content into <code>public/content/event_{id}</code>.</li>
+          <li><code>API\ExamController</code> creates exams by event code and starts or resumes exams for the examiner client.</li>
+          <li><code>StartExam</code> marks exams active and asks <code>ExamHandler</code> to create/update <code>public/exams/exam_{exam_no}.edr</code>.</li>
+          <li><code>public/exam-route/attempt-question.php</code> records attempts directly into the <code>.edr</code> file.</li>
+          <li><code>EndExam</code> scores active exams by comparing file attempts with downloaded question answers.</li>
+          <li><code>EventExamsHandler::uploadEventExams()</code> sends completed local exam records back to the remote platform.</li>
+        </ol>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

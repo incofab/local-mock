@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Testing and Operations - Local Mock Docs</title>
+  <link rel="stylesheet" href="docs.css">
+</head>
+<body>
+  <header>
+    <h1>Testing and Operations</h1>
+    <p>Development commands, dependencies, tests, factories, and operational notes.</p>
+  </header>
+
+  <div class="layout">
+    <nav>
+      <h2>Docs Pages</h2>
+      <a href="index.html">Overview</a>
+      <a href="architecture.html">Architecture</a>
+      <a href="workflows.html">Workflows</a>
+      <a href="routes-controllers.html">Routes and Controllers</a>
+      <a href="domain-logic.html">Domain Logic</a>
+      <a href="data-storage.html">Data and Storage</a>
+      <a href="frontend-public.html">Frontend and Public Scripts</a>
+      <a href="testing-operations.html">Testing and Operations</a>
+      <a href="ai-change-guide.html">AI Change Guide</a>
+    </nav>
+
+    <main>
+      <section>
+        <h2>Commands</h2>
+        <table>
+          <thead><tr><th>Command</th><th>Purpose</th></tr></thead>
+          <tbody>
+            <tr><td><code>sail composer install</code></td><td>Install PHP dependencies.</td></tr>
+            <tr><td><code>sail npm install</code></td><td>Install Vite and frontend tooling.</td></tr>
+            <tr><td><code>sail artisan serve</code></td><td>Run Laravel locally.</td></tr>
+            <tr><td><code>sail npm run dev</code></td><td>Run Vite development server.</td></tr>
+            <tr><td><code>sail npm run build</code></td><td>Compile frontend assets.</td></tr>
+            <tr><td><code>sail artisan test</code></td><td>Run Pest/PHPUnit tests.</td></tr>
+            <tr><td><code>./vendor/bin/pint</code></td><td>Format PHP code.</td></tr>
+            <tr><td><code>sail artisan app:reset</code></td><td>Run <code>migrate:fresh</code> and delete local institution data.</td></tr>
+            <tr><td><code>sail artisan app:reset-password {email|all} {password}</code></td><td>Reset one or up to 50 users' passwords.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2>Dependencies</h2>
+        <p>
+          PHP dependencies include <code>laravel/framework</code>,
+          <code>guzzlehttp/guzzle</code>, Pest, Laravel Sail, Pint, Tinker,
+          Mockery, Collision, and Ignition. Composer autoloads
+          <code>app/helpers.php</code>.
+        </p>
+        <p>
+          Node tooling includes Vite, Laravel Vite plugin, Axios, Prettier, and
+          <code>@prettier/plugin-php</code>. <code>package.json</code> exposes
+          <code>dev</code> and <code>build</code> scripts only.
+        </p>
+      </section>
+
+      <section>
+        <h2>Tests</h2>
+        <p>
+          Tests are Pest-based. <code>tests/Pest.php</code> binds feature tests
+          to <code>Tests\TestCase</code> and uses
+          <code>DatabaseTransactions</code>.
+        </p>
+        <ul>
+          <li><code>tests/Feature/Helpers/ExamHandlerTest.php</code> covers exam file sync, attempt recording, file ending, time elapsed detection, and valid content loading.</li>
+          <li><code>tests/Feature/Http/Controllers/Admin/EventControllerTest.php</code> covers event index/show/sync/refresh/evaluate/download/upload and event-wide time extension using HTTP fakes from <code>FakeData</code>.</li>
+          <li><code>tests/Feature/Http/Controllers/API/ExamControllerTest.php</code> covers starting an exam, validation failure for unknown exam number, and startup failure for ended exams.</li>
+          <li><code>tests/Unit/ExampleTest.php</code> and <code>tests/Feature/ExampleTest.php</code> are scaffold examples.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Factories and Sample Data</h2>
+        <p>
+          Factories exist for users, events, exams, courses, course sessions,
+          event courses, exam courses, questions, students, and topics. Some
+          factory methods reference older relationships that may not exist on
+          the current JSON-backed models, so inspect before reusing in new tests.
+        </p>
+        <p>
+          <code>public/sample-data</code> contains JSON payloads consumed by
+          <code>FakeData</code> for HTTP fakes: sample institution, list events,
+          single event, deep event, and list exams.
+        </p>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

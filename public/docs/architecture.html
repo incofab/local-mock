@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Architecture - Local Mock Docs</title>
+  <link rel="stylesheet" href="docs.css">
+</head>
+<body>
+  <header>
+    <h1>Architecture</h1>
+    <p>Project structure, runtime layers, and major design decisions.</p>
+  </header>
+
+  <div class="layout">
+    <nav>
+      <h2>Docs Pages</h2>
+      <a href="index.html">Overview</a>
+      <a href="architecture.html">Architecture</a>
+      <a href="workflows.html">Workflows</a>
+      <a href="routes-controllers.html">Routes and Controllers</a>
+      <a href="domain-logic.html">Domain Logic</a>
+      <a href="data-storage.html">Data and Storage</a>
+      <a href="frontend-public.html">Frontend and Public Scripts</a>
+      <a href="testing-operations.html">Testing and Operations</a>
+      <a href="ai-change-guide.html">AI Change Guide</a>
+    </nav>
+
+    <main>
+      <section>
+        <h2>High-level Layers</h2>
+        <table>
+          <thead>
+            <tr><th>Layer</th><th>Location</th><th>Responsibility</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>HTTP routes</td><td><code>routes/web.php</code>, <code>routes/api.php</code></td><td>Expose admin web pages and examiner API endpoints.</td></tr>
+            <tr><td>Controllers</td><td><code>app/Http/Controllers</code></td><td>Validate requests, call actions/helpers, return Blade views, redirects, or JSON.</td></tr>
+            <tr><td>Domain actions</td><td><code>app/Actions</code></td><td>Coordinate institution registration, event sync/download/upload, exam start/end, scoring, time extension, and image compilation.</td></tr>
+            <tr><td>Helpers/support</td><td><code>app/Helpers</code>, <code>app/Support</code></td><td>Manage local exam files, response wrappers, remote URLs, content paths, and HTTP calls.</td></tr>
+            <tr><td>Models</td><td><code>app/Models</code></td><td>Eloquent models and JSON-backed value shapes for events, exams, students, courses, sessions, and questions.</td></tr>
+            <tr><td>Admin UI</td><td><code>resources/views</code></td><td>Blade screens for login, registration, event management, exam management, and time extension.</td></tr>
+            <tr><td>Exam client</td><td><code>public/examiner</code>, <code>public/exam-route</code></td><td>Static examiner app and raw PHP endpoints for attempts, ending exams, and images.</td></tr>
+            <tr><td>Runtime files</td><td><code>public/content</code>, <code>public/exams</code>, <code>public/institution-data.json</code></td><td>Downloaded event content, compiled images, per-exam JSON, live tracking files, and institution config.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2>Important Design Choices</h2>
+        <h3>JSON-backed domain data</h3>
+        <p>
+          Much of the exam content is stored as JSON instead of normalized
+          tables. <code>events.event_courses</code>,
+          <code>events.external_event_courses</code>, <code>exams.student</code>,
+          <code>exams.exam_courses</code>, and <code>exams.attempts</code> are
+          JSON columns or file-backed structures converted to model objects by
+          Eloquent accessors.
+        </p>
+
+        <h3>File-backed live attempts</h3>
+        <p>
+          Live exam attempts are tracked in <code>public/exams/exam_{exam_no}.edr</code>.
+          The database receives final attempts during evaluation through
+          <code>Exam::markAsEnded()</code>.
+        </p>
+
+        <h3>Raw PHP public scripts</h3>
+        <p>
+          Files in <code>public/exam-route</code> do not bootstrap Laravel.
+          They directly require <code>ExamHandler</code> and
+          <code>ExamProcess</code>. Any change there must preserve this minimal
+          runtime unless the bootstrap strategy is intentionally redesigned.
+        </p>
+      </section>
+
+      <section>
+        <h2>Key Directories</h2>
+        <table>
+          <thead><tr><th>Path</th><th>Meaning</th></tr></thead>
+          <tbody>
+            <tr><td><code>app/Actions</code></td><td>Application services for institution setup, event sync/download/upload, exam lifecycle, fake data, and image compilation.</td></tr>
+            <tr><td><code>app/Helpers/ExamHandler.php</code></td><td>Local exam tracking file manager and scorer.</td></tr>
+            <tr><td><code>app/Support</code></td><td>Path, response, platform URL, HTTP integration, and exam process support objects.</td></tr>
+            <tr><td><code>public/content</code></td><td>Downloaded event content and images.</td></tr>
+            <tr><td><code>public/exams</code></td><td>Live exam tracking files.</td></tr>
+            <tr><td><code>public/examiner</code></td><td>Bundled static examiner frontend.</td></tr>
+            <tr><td><code>public/exam-route</code></td><td>Standalone PHP endpoints used by the examiner client.</td></tr>
+          </tbody>
+        </table>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

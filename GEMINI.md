@@ -5,6 +5,20 @@ backend and Vite for the frontend. The application appears to be an exam
 management system, with features for managing events and exams. It uses a MySQL
 database to store data.
 
+# Canonical Project Documentation
+
+Read `public/docs/index.html` before making changes. The `public/docs/` folder
+is the canonical technical documentation for this repository and is split into
+focused HTML pages for architecture, workflows, routes and controllers, domain
+logic, data/storage, frontend/public scripts, testing, and AI change guidance.
+
+When adding a feature or changing behavior, update the relevant page in
+`public/docs/` in the same change. This includes changes to routes,
+controllers, actions, helpers, support classes, models, migrations, public
+examiner scripts, file formats, storage locations, tests, commands, or
+operational workflows. If a new subsystem needs its own page, add it under
+`public/docs/` and link it from `public/docs/index.html`.
+
 # Building and Running
 
 ## Backend

@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Workflows - Local Mock Docs</title>
+  <link rel="stylesheet" href="docs.css">
+</head>
+<body>
+  <header>
+    <h1>Core Workflows</h1>
+    <p>End-to-end behavior from first setup through result upload.</p>
+  </header>
+
+  <div class="layout">
+    <nav>
+      <h2>Docs Pages</h2>
+      <a href="index.html">Overview</a>
+      <a href="architecture.html">Architecture</a>
+      <a href="workflows.html">Workflows</a>
+      <a href="routes-controllers.html">Routes and Controllers</a>
+      <a href="domain-logic.html">Domain Logic</a>
+      <a href="data-storage.html">Data and Storage</a>
+      <a href="frontend-public.html">Frontend and Public Scripts</a>
+      <a href="testing-operations.html">Testing and Operations</a>
+      <a href="ai-change-guide.html">AI Change Guide</a>
+    </nav>
+
+    <main>
+      <section>
+        <h2>First-time Institution Setup</h2>
+        <ol>
+          <li>Guest opens <code>/login</code>.</li>
+          <li><code>LoginController::create()</code> redirects to <code>/register</code> if <code>public/institution-data.json</code> does not exist.</li>
+          <li><code>RegistrationController::store()</code> validates user data, institution code, and platform.</li>
+          <li><code>InstitutionHandler::processInstitutionCode()</code> builds a URL through <code>PlatformUrl::make()</code> and posts to <code>showInstitution()</code>.</li>
+          <li>On success, institution data plus selected platform is saved to <code>public/institution-data.json</code>.</li>
+          <li>The first admin user is created and logged in.</li>
+        </ol>
+      </section>
+
+      <section>
+        <h2>Sync and Refresh Events</h2>
+        <ol>
+          <li>Admin uses Sync Events or Refresh.</li>
+          <li><code>EventController</code> calls <code>SyncEvents::all()</code> or <code>SyncEvents::single($event)</code>.</li>
+          <li><code>WebsiteHelper</code> fetches event data from the remote platform.</li>
+          <li>Events are stored locally in the <code>events</code> table with JSON event-course payloads.</li>
+        </ol>
+      </section>
+
+      <section>
+        <h2>Download Event Content</h2>
+        <ol>
+          <li>Admin downloads an event or downloads by event code.</li>
+          <li><code>EventExamsHandler::downloadEventContent()</code> fetches deep event content and registered exams.</li>
+          <li><code>SyncEvents::saveToFile()</code> deletes any old <code>public/content/event_{id}</code> folder, recreates <code>images</code> and <code>exams</code>, writes course session JSON, creates or updates pending exam records, writes per-exam JSON, and compiles images.</li>
+          <li><code>CompileEventImages</code> extracts image URLs from question HTML and downloads non-embedded images into the event images folder.</li>
+        </ol>
+        <div class="warning">
+          <code>SyncEvents::saveToFile()</code> deletes and recreates the event
+          content folder. Be careful when changing this path or behavior.
+        </div>
+      </section>
+
+      <section>
+        <h2>Create Exam By Event Code</h2>
+        <ol>
+          <li>Exam client posts to <code>/api/exam/create-by-code</code> with <code>event_code</code>, confirmed <code>student_code</code>, and <code>name</code>.</li>
+          <li><code>API\ExamController::createExamByCode()</code> finds the event and calls private <code>createExam()</code>.</li>
+          <li>Creation fails if event content is not downloaded.</li>
+          <li>Exam number is <code>{event_code}-{student_code}</code>. Existing exams are reused.</li>
+          <li>New exams get pending status, student JSON, exam course JSON generated from event courses, and a local exam JSON file under <code>public/content/event_{id}/exams</code>.</li>
+        </ol>
+      </section>
+
+      <section>
+        <h2>Start or Resume Exam</h2>
+        <ol>
+          <li>Exam client posts to <code>/api/exam/start</code> with <code>exam_no</code>.</li>
+          <li><code>API\ExamController::startExam()</code> loads the exam and event.</li>
+          <li><code>StartExam::getExamStartupData()</code> verifies downloaded content and starts pending or paused exams.</li>
+          <li><code>Exam::markAsStarted()</code> sets status active, start time, null pause time, and <code>end_time</code> from event duration.</li>
+          <li><code>ExamHandler::syncExamFile()</code> creates or updates <code>public/exams/exam_{exam_no}.edr</code>.</li>
+          <li><code>StartExam::prepareExam()</code> injects course sessions and strips answers before returning JSON.</li>
+        </ol>
+      </section>
+
+      <section>
+        <h2>Record Attempts and End from Examiner Client</h2>
+        <ol>
+          <li>The examiner app posts attempts to <code>public/exam-route/attempt-question.php</code>.</li>
+          <li>The script calls <code>ExamHandler::attemptQuestion()</code>, which merges attempts into the <code>.edr</code> file.</li>
+          <li>The examiner app posts to <code>public/exam-route/end-exam.php</code> to mark the file's embedded exam status as ended.</li>
+        </ol>
+      </section>
+
+      <section>
+        <h2>Evaluate, Extend, and Upload</h2>
+        <h3>Evaluate</h3>
+        <ol>
+          <li>Admin evaluates one exam or an entire event.</li>
+          <li><code>EndExam::endExam()</code> refuses already ended or non-active exams.</li>
+          <li>It compares saved attempts with downloaded question answers, stores score and question count, marks exam ended, and syncs the tracking file.</li>
+        </ol>
+        <h3>Extend Time</h3>
+        <ol>
+          <li><code>ExtendExamTime::run()</code> uses the future end time if available, otherwise now.</li>
+          <li>It sets status active, clears pause time, adds requested minutes, saves, and syncs the tracking file.</li>
+        </ol>
+        <h3>Upload</h3>
+        <ol>
+          <li><code>EventExamsHandler::uploadEventExams()</code> chunks event exams by 100.</li>
+          <li><code>WebsiteHelper::uploadExams()</code> posts results to the platform.</li>
+          <li>Exam upload timestamps/messages and the event upload timestamp are updated locally.</li>
+        </ol>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

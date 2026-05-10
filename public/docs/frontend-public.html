@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Frontend and Public Scripts - Local Mock Docs</title>
+  <link rel="stylesheet" href="docs.css">
+</head>
+<body>
+  <header>
+    <h1>Frontend and Public Scripts</h1>
+    <p>Blade views, admin UI, examiner client assets, and standalone public PHP routes.</p>
+  </header>
+
+  <div class="layout">
+    <nav>
+      <h2>Docs Pages</h2>
+      <a href="index.html">Overview</a>
+      <a href="architecture.html">Architecture</a>
+      <a href="workflows.html">Workflows</a>
+      <a href="routes-controllers.html">Routes and Controllers</a>
+      <a href="domain-logic.html">Domain Logic</a>
+      <a href="data-storage.html">Data and Storage</a>
+      <a href="frontend-public.html">Frontend and Public Scripts</a>
+      <a href="testing-operations.html">Testing and Operations</a>
+      <a href="ai-change-guide.html">AI Change Guide</a>
+    </nav>
+
+    <main>
+      <section>
+        <h2>Blade Views</h2>
+        <table>
+          <thead><tr><th>View</th><th>Purpose</th></tr></thead>
+          <tbody>
+            <tr><td><code>resources/views/admin/layout.blade.php</code></td><td>Bootstrap admin shell with fixed sidebar, navbar, logout link, Bootstrap, jQuery, and Font Awesome assets.</td></tr>
+            <tr><td><code>resources/views/admin/index.blade.php</code></td><td>Dashboard showing current institution name and a card linking to events.</td></tr>
+            <tr><td><code>resources/views/admin/events/index.blade.php</code></td><td>Event list with sync, download by code, refresh, download, upload, evaluate, exams, and extend-time actions.</td></tr>
+            <tr><td><code>resources/views/admin/events/show.blade.php</code></td><td>Event detail page with subject/course information.</td></tr>
+            <tr><td><code>resources/views/admin/events/enter-event-code.blade.php</code></td><td>Form for downloading event content by event code.</td></tr>
+            <tr><td><code>resources/views/admin/events/extend-time.blade.php</code></td><td>Form for extending all exams in an event.</td></tr>
+            <tr><td><code>resources/views/admin/exams/index.blade.php</code></td><td>Exam table with student, status, score, subjects, countdown for ongoing exams, upload message, and per-exam actions.</td></tr>
+            <tr><td><code>resources/views/admin/exams/extend-time.blade.php</code></td><td>Form for extending one exam.</td></tr>
+            <tr><td><code>resources/views/admin/exams/edit-exam-no.blade.php</code></td><td>Form to correct a student's exam number.</td></tr>
+            <tr><td><code>resources/views/auth/layout.blade.php</code></td><td>Auth shell.</td></tr>
+            <tr><td><code>resources/views/auth/login.blade.php</code></td><td>Email/password login.</td></tr>
+            <tr><td><code>resources/views/auth/register.blade.php</code></td><td>User registration plus institution code/platform setup.</td></tr>
+            <tr><td><code>resources/views/common/message.blade.php</code></td><td>Displays validation errors and session messages.</td></tr>
+            <tr><td><code>resources/views/common/paginate.blade.php</code></td><td>Simple previous/next pagination partial preserving query parameters.</td></tr>
+            <tr><td><code>resources/views/common/_delete_form.blade.php</code></td><td>Reusable delete form partial, although current exam delete route is a GET link.</td></tr>
+            <tr><td><code>resources/views/welcome.blade.php</code></td><td>Default Laravel welcome page; not used by root route.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2>Frontend Assets</h2>
+        <p>
+          <code>resources/css/app.css</code>, <code>resources/js/app.js</code>,
+          and <code>resources/js/bootstrap.js</code> are Vite scaffold entry
+          files. Admin pages currently load public Bootstrap, jQuery, and Font
+          Awesome assets directly from <code>public/lib</code>.
+        </p>
+        <p>
+          The static examiner frontend is already built under
+          <code>public/examiner</code>, with static JS/CSS bundles, manifest,
+          Electron file, favicon, robots file, and local libraries.
+        </p>
+      </section>
+
+      <section>
+        <h2>Public Exam Scripts</h2>
+        <table>
+          <thead><tr><th>Script</th><th>Behavior</th></tr></thead>
+          <tbody>
+            <tr><td><code>public/exam-route/exam-route-base.php</code></td><td>Sets CORS and JSON headers, handles OPTIONS preflight, includes <code>ExamHandler</code> and <code>ExamProcess</code>, defines <code>emitResponse()</code> and <code>dlog()</code>.</td></tr>
+            <tr><td><code>public/exam-route/attempt-question.php</code></td><td>Reads JSON input, gets <code>exam_no</code> and <code>attempts</code>, calls <code>ExamHandler::attemptQuestion()</code>, and returns success/failure arrays.</td></tr>
+            <tr><td><code>public/exam-route/end-exam.php</code></td><td>Reads JSON input, calls <code>ExamHandler::endExam($examNo)</code>, and returns success when the file update works.</td></tr>
+            <tr><td><code>public/exam-route/exam-img.php</code></td><td>Serves images from <code>public/content/event_{event_id}/images/session_{course_session_id}_{filename}</code> with JPEG content type.</td></tr>
+          </tbody>
+        </table>
+        <div class="warning">
+          These scripts are not full Laravel entry points. They only require
+          direct class files. Do not add Laravel-only dependencies here without
+          changing the bootstrap strategy.
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
