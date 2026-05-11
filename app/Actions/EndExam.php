@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Actions;
 
 use App\Enums\ExamStatus;
@@ -10,17 +11,18 @@ use App\Support\Res;
 class EndExam
 {
   private ExamHandler $examHandler;
-  function __construct()
+
+  public function __construct()
   {
     $this->examHandler = new ExamHandler();
   }
 
-  static function make()
+  public static function make()
   {
     return new self();
   }
 
-  function endEventExams(Event $event)
+  public function endEventExams(Event $event)
   {
     $exams = $event->exams()->with('event')->get();
     foreach ($exams as $exam) {
@@ -28,7 +30,7 @@ class EndExam
     }
   }
 
-  function endExam(Exam $exam): Res
+  public function endExam(Exam $exam): Res
   {
     $examCourses = $exam->exam_courses;
     if ($exam->status === ExamStatus::Ended) {
@@ -41,33 +43,48 @@ class EndExam
     $totalScore = 0;
     $totalNumOfQuestions = 0;
     $eventExamHandler = new EventExamsHandler($exam->event);
-    /** @var \App\Models\ExamCourse $examCourse */
-    foreach ($examCourses as $examCourse) {
-      $questions =
-        $eventExamHandler->getCourseSession($examCourse->course_session_id)[
-          'questions'
-        ] ?? [];
-
-      $scoreDetail = $this->examHandler->calculateScoreFromFile(
-        $exam,
-        $questions
-      );
-
-      $score = $scoreDetail->getScore();
-      $numOfQuestions = $scoreDetail->getNumOfQuestions();
-      $examCourse->fill([
-        'score' => $score,
-        'num_of_questions' => $numOfQuestions,
-        'status' => ExamStatus::Ended->value,
-      ]);
-      $totalScore += $score;
-      $totalNumOfQuestions += $numOfQuestions;
-    }
     $attempts =
       $this->examHandler->getContent($exam->exam_no)->getExamTrack()[
         'attempts'
       ] ?? [];
-    $exam->markAsEnded($totalScore, $totalNumOfQuestions, $attempts);
+
+    /** @var \App\Models\ExamCourse $examCourse */
+    foreach ($examCourses as $examCourse) {
+      $courseSession = $eventExamHandler->getCourseSession(
+        $examCourse->course_session_id
+      );
+      $questions = $courseSession?->questions ?? collect();
+
+      $scoreDetail = $this->examHandler->calculateScoreFromAttempts(
+        $questions,
+        $attempts
+      );
+
+      $score = $scoreDetail->getScore();
+      $numOfQuestions = $scoreDetail->getNumOfQuestions();
+      $theoryQuestions = $courseSession?->theory_questions ?? collect();
+      $theoryNumOfQuestions = $theoryQuestions->count();
+      $theoryMaxScore = $theoryQuestions->sum('marks');
+      $theoryScore =
+        $theoryNumOfQuestions > 0 && $examCourse->theory_evaluated
+          ? $examCourse->theory_score
+          : 0;
+      $examCourse->fill([
+        'score' => $score,
+        'num_of_questions' => $numOfQuestions,
+        'theory_score' => $theoryScore,
+        'theory_max_score' => $theoryMaxScore,
+        'theory_num_of_questions' => $theoryNumOfQuestions,
+        'theory_evaluated' =>
+          $theoryNumOfQuestions === 0 ? true : $examCourse->theory_evaluated,
+        'status' => ExamStatus::Ended->value,
+      ]);
+      $totalScore += $score;
+      $totalNumOfQuestions += $numOfQuestions + $theoryNumOfQuestions;
+    }
+    $exam->markAsEnded($totalScore, $totalNumOfQuestions, $attempts, [
+      'exam_courses' => $examCourses->toArray(),
+    ]);
     $this->examHandler->syncExamFile($exam, false);
 
     return successRes('Exam ended');

@@ -6,7 +6,7 @@ use App\Models\Institution;
 
 abstract class PlatformUrl
 {
-  protected string $baseUrl;
+  public string $baseUrl;
   function __construct(protected string $code)
   {
     $this->baseUrl = $this->getBaseUrl($code);

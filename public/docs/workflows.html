@@ -33,7 +33,8 @@
           <li>Guest opens <code>/login</code>.</li>
           <li><code>LoginController::create()</code> redirects to <code>/register</code> if <code>public/institution-data.json</code> does not exist.</li>
           <li><code>RegistrationController::store()</code> validates user data, institution code, and platform.</li>
-          <li><code>InstitutionHandler::processInstitutionCode()</code> builds a URL through <code>PlatformUrl::make()</code> and posts to <code>showInstitution()</code>.</li>
+          <li><code>InstitutionHandler::processInstitutionCode()</code> first checks <code>LocalApiFixture</code>. If <code>public/sample-data/local-api-fixture.json</code> exists and matches the submitted institution code/platform, that JSON is used instead of the remote platform.</li>
+          <li>Without a matching fixture, <code>InstitutionHandler::processInstitutionCode()</code> builds a URL through <code>PlatformUrl::make()</code> and posts to <code>showInstitution()</code>.</li>
           <li>On success, institution data plus selected platform is saved to <code>public/institution-data.json</code>.</li>
           <li>The first admin user is created and logged in.</li>
         </ol>
@@ -44,7 +45,7 @@
         <ol>
           <li>Admin uses Sync Events or Refresh.</li>
           <li><code>EventController</code> calls <code>SyncEvents::all()</code> or <code>SyncEvents::single($event)</code>.</li>
-          <li><code>WebsiteHelper</code> fetches event data from the remote platform.</li>
+          <li><code>WebsiteHelper</code> fetches event data from <code>LocalApiFixture</code> when the current institution matches the fixture; otherwise it calls the remote platform.</li>
           <li>Events are stored locally in the <code>events</code> table with JSON event-course payloads.</li>
         </ol>
       </section>
@@ -52,15 +53,25 @@
       <section>
         <h2>Download Event Content</h2>
         <ol>
-          <li>Admin downloads an event or downloads by event code.</li>
-          <li><code>EventExamsHandler::downloadEventContent()</code> fetches deep event content and registered exams.</li>
-          <li><code>SyncEvents::saveToFile()</code> deletes any old <code>public/content/event_{id}</code> folder, recreates <code>images</code> and <code>exams</code>, writes course session JSON, creates or updates pending exam records, writes per-exam JSON, and compiles images.</li>
-          <li><code>CompileEventImages</code> extracts image URLs from question HTML and downloads non-embedded images into the event images folder.</li>
+          <li>Admin downloads an event or downloads by event code. Event-code download upserts the returned event before writing content files.</li>
+          <li><code>EventExamsHandler::downloadEventContent()</code> fetches deep event content and registered exams through <code>WebsiteHelper</code>, which may return local fixture JSON.</li>
+          <li><code>SyncEvents::saveToFile()</code> deletes any old <code>public/content/event_{id}</code> folder, recreates <code>images</code> and <code>exams</code>, writes course session JSON including OBJ and theory questions, creates or updates pending exam records, writes per-exam JSON, and compiles images.</li>
+          <li><code>CompileEventImages</code> extracts image URLs from OBJ question HTML and theory question/answer/marking-scheme HTML, then downloads non-embedded images into the event images folder.</li>
         </ol>
         <div class="warning">
           <code>SyncEvents::saveToFile()</code> deletes and recreates the event
           content folder. Be careful when changing this path or behavior.
         </div>
+      </section>
+
+      <section>
+        <h2>Local Practice API Fixture</h2>
+        <ol>
+          <li>Run <code>sail artisan app:write-practice-api-fixture</code> to write <code>public/sample-data/local-api-fixture.json</code>.</li>
+          <li>Initialize the app with institution code <code>PRACTICE-INSTITUTION</code> and platform <code>examscholars-mock</code>, unless custom command options were used.</li>
+          <li>Sync events and download the mixed practice event. Institution, event list, deep event, event-code download, exam list, and upload calls are served from the fixture JSON.</li>
+          <li>Start exam <code>MIXED-PRACTICE-001</code> or create a new exam with event code <code>MIXED-PRACTICE</code>. The startup API returns one course session containing both OBJ questions and theory questions, with answers stripped.</li>
+        </ol>
       </section>
 
       <section>
@@ -81,8 +92,8 @@
           <li><code>API\ExamController::startExam()</code> loads the exam and event.</li>
           <li><code>StartExam::getExamStartupData()</code> verifies downloaded content and starts pending or paused exams.</li>
           <li><code>Exam::markAsStarted()</code> sets status active, start time, null pause time, and <code>end_time</code> from event duration.</li>
-          <li><code>ExamHandler::syncExamFile()</code> creates or updates <code>public/exams/exam_{exam_no}.edr</code>.</li>
-          <li><code>StartExam::prepareExam()</code> injects course sessions and strips answers before returning JSON.</li>
+          <li><code>ExamHandler::syncExamFile()</code> creates or updates <code>public/exams/exam_{exam_no}.edr</code>. Newly started pending or paused exams overwrite stale tracking files before time validation; active resumes still validate the file's time/status.</li>
+          <li><code>StartExam::prepareExam()</code> injects course sessions and strips OBJ answers, theory answers, and theory marking schemes before returning JSON.</li>
         </ol>
       </section>
 
@@ -90,7 +101,7 @@
         <h2>Record Attempts and End from Examiner Client</h2>
         <ol>
           <li>The examiner app posts attempts to <code>public/exam-route/attempt-question.php</code>.</li>
-          <li>The script calls <code>ExamHandler::attemptQuestion()</code>, which merges attempts into the <code>.edr</code> file.</li>
+          <li>The script calls <code>ExamHandler::attemptQuestion()</code>, which merges attempts into the <code>.edr</code> file. Theory-capable clients should use non-colliding keys such as <code>theory-{question_id}</code>, matching the online examiner pattern.</li>
           <li>The examiner app posts to <code>public/exam-route/end-exam.php</code> to mark the file's embedded exam status as ended.</li>
         </ol>
       </section>
@@ -101,7 +112,7 @@
         <ol>
           <li>Admin evaluates one exam or an entire event.</li>
           <li><code>EndExam::endExam()</code> refuses already ended or non-active exams.</li>
-          <li>It compares saved attempts with downloaded question answers, stores score and question count, marks exam ended, and syncs the tracking file.</li>
+          <li>It compares saved OBJ attempts with downloaded OBJ answers, counts theory questions and obtainable theory marks from the course-session files, stores theory metadata in <code>exam_courses</code> JSON, marks exam ended, and syncs the tracking file.</li>
         </ol>
         <h3>Extend Time</h3>
         <ol>

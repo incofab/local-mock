@@ -2,12 +2,17 @@
 
 ## Project Structure & Module Organization
 
-This is a Laravel 10 application. Core PHP code lives in `app/`, with domain
-helpers and platform support under `app/Helpers` and `app/Support`. HTTP routes
-are in `routes/`, database migrations, factories, and seeders are in
-`database/`, and Blade views plus Vite assets live in `resources/views`,
-`resources/css`, and `resources/js`. Publicly served assets belong in `public/`.
-Tests are split between `tests/Feature` and `tests/Unit`.
+- This is a Laravel 10 application. Core PHP code lives in `app/`, with domain
+  helpers and platform support under `app/Helpers` and `app/Support`.
+- HTTP routes are in `routes/`, database migrations, factories, and seeders are
+  in `database/`, and Blade views plus Vite assets live in `resources/views`,
+  `resources/css`, and `resources/js`. Publicly served assets belong in
+  `public/`.
+- Tests are split between `tests/Feature` and `tests/Unit`.
+- The php files in this folder `public/exam-route` provides endpoints endpoints
+  that the for the frontend to interact with the backend on events updating exam
+  attempts and ending exams. It's intentionally built to be accessed as vanilla
+  php instead laravel to improve performance.
 
 ## Canonical Project Documentation
 

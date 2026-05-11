@@ -14,15 +14,16 @@ use Illuminate\Validation\ValidationException;
 
 class EventController extends Controller
 {
-  function index()
+  public function index()
   {
     $query = Event::query()->withCount('exams')->latest('id');
+
     return view('admin.events.index', [
       'records' => paginateFromRequest($query),
     ]);
   }
 
-  function show(Event $event)
+  public function show(Event $event)
   {
     //dd(json_encode($event->toArray(), JSON_PRETTY_PRINT));
     return view('admin.events.show', [
@@ -30,48 +31,53 @@ class EventController extends Controller
     ]);
   }
 
-  function syncEvents()
+  public function syncEvents()
   {
     SyncEvents::make()->all();
+
     return back()->with('message', 'Events synced successfully');
   }
 
-  function refreshEvent(Event $event)
+  public function refreshEvent(Event $event)
   {
     SyncEvents::make()->single($event);
+
     return back()->with('message', 'Events refreshed successfully');
   }
 
-  function evaluateEVent(Event $event)
+  public function evaluateEVent(Event $event)
   {
     EndExam::make()->endEventExams($event);
+
     return back()->with('message', 'Result evaluated successfully');
   }
 
   /**
    * Download and redownload event details
    */
-  function download(Event $event)
+  public function download(Event $event)
   {
     $res = (new EventExamsHandler($event))->downloadEventContent();
+
     return back()->with(
       $res->isSuccessful() ? 'message' : 'error',
       $res->getMessage()
     );
   }
 
-  function uploadEventExams(Event $event)
+  public function uploadEventExams(Event $event)
   {
     $res = (new EventExamsHandler($event))->uploadEventExams();
+
     return back()->with('message', $res->getMessage());
   }
 
-  function extentTimeView(Event $event)
+  public function extentTimeView(Event $event)
   {
     return view('admin.events.extend-time', ['event' => $event]);
   }
 
-  function extentTimeStore(Event $event, Request $request)
+  public function extentTimeStore(Event $event, Request $request)
   {
     $request->validate(['duration' => ['required', 'integer', 'min:1']]);
 
@@ -86,7 +92,7 @@ class EventController extends Controller
     );
   }
 
-  function downloadByEventCode(Request $request)
+  public function downloadByEventCode(Request $request)
   {
     if (!$request->isMethod('POST')) {
       return view('admin.events.enter-event-code');
@@ -101,9 +107,14 @@ class EventController extends Controller
       ]);
     }
 
+    $eventModel = Event::query()->updateOrCreate(
+      ['id' => $event['id']],
+      collect($event)->except('id')->toArray()
+    );
+
     SyncEvents::make()->saveToFile($event, []);
 
-    return redirect(route('admin.events.show', $event))->with(
+    return redirect(route('admin.events.show', $eventModel))->with(
       'message',
       'Event downloaded successfully'
     );

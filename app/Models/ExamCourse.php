@@ -12,6 +12,11 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $course_session_id
  * @property int $num_of_questions
  * @property int $score
+ * @property int $theory_num_of_questions
+ * @property float $theory_score
+ * @property float $theory_max_score
+ * @property ?array $theory_question_scores
+ * @property bool $theory_evaluated
  * @property ?string $course_code
  * @property ?string $session
  * @property Exam $exam
@@ -21,6 +26,16 @@ class ExamCourse extends Model
 {
   use HasFactory;
   protected $guarded = [];
+  protected $casts = [
+    'course_session_id' => 'integer',
+    'num_of_questions' => 'integer',
+    'score' => 'float',
+    'theory_num_of_questions' => 'integer',
+    'theory_score' => 'float',
+    'theory_max_score' => 'float',
+    'theory_question_scores' => 'array',
+    'theory_evaluated' => 'boolean',
+  ];
 
   function courseSession(): Attribute
   {

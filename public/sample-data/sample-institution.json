@@ -3,5 +3,6 @@
   "name": "Success Academy",
   "address": "123, Fake Street, Fake City",
   "phone": "1234567890",
-  "email": "email@email.com"
+  "email": "email@email.com",
+  "platform": "examscholars-mock"
 }

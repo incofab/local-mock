@@ -33,6 +33,9 @@ class CompileEventImages
     foreach ($courseSession->questions as $key => $question) {
       $html .= "<div>{$question->question} {$question->option_a} {$question->option_b} {$question->option_c} {$question->option_d} {$question->option_e} {$question->answer_meta}</div>";
     }
+    foreach ($courseSession->theory_questions as $key => $question) {
+      $html .= "<div>{$question->question} {$question->answer} {$question->marking_scheme}</div>";
+    }
     return $html;
   }
 

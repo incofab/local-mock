@@ -27,7 +27,9 @@ class FakeData
   function registerInstitutionFaker()
   {
     $url =
-      WebsiteHelper::make()->getBaseUrl() . 'institutions/*/show-institution';
+      WebsiteHelper::make()->getPlatformUrl()->baseUrl .
+      'institutions/*/show-institution';
+
     Http::fake([
       $url => Http::response([
         'success' => true,
@@ -42,7 +44,7 @@ class FakeData
 
   private function listEvents()
   {
-    $url = WebsiteHelper::make()->url(WebsiteHelper::LIST_EVENTS);
+    $url = WebsiteHelper::make()->getPlatformUrl()->listEvents();
     $url2 = "$url?latest_event_id=*";
     $res = Http::response([
       'success' => true,
@@ -60,9 +62,9 @@ class FakeData
 
   private function showEvent()
   {
-    $url = WebsiteHelper::make()->url(WebsiteHelper::SHOW_EVENT, [
-      'event' => '*',
-    ]);
+    $url =
+      rtrim(WebsiteHelper::make()->getPlatformUrl()->showEvent(1), '1') . '*';
+    // info($url);
     Http::fake([
       $url => Http::response([
         'success' => true,
@@ -77,9 +79,9 @@ class FakeData
 
   private function showDeepEvent()
   {
-    $url = WebsiteHelper::make()->url(WebsiteHelper::SHOW_DEEP_EVENT, [
-      'event' => '*',
-    ]);
+    $url =
+      rtrim(WebsiteHelper::make()->getPlatformUrl()->showDeepEvent(1), '1') .
+      '*';
     Http::fake([
       $url => Http::response([
         'success' => true,
@@ -94,9 +96,9 @@ class FakeData
 
   private function listExams()
   {
-    $url = WebsiteHelper::make()->url(WebsiteHelper::LIST_EVENT_EXAMS, [
-      'event' => '*',
-    ]);
+    $url =
+      rtrim(WebsiteHelper::make()->getPlatformUrl()->listEventExams(1), '1') .
+      '*';
     Http::fake([
       $url => Http::response([
         'success' => true,

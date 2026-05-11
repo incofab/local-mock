@@ -1,7 +1,8 @@
 <?php
 
-use App\Models\Exam;
 use App\Helpers\ExamHandler;
+use App\Models\Exam;
+use App\Support\ContentFilePath;
 use Illuminate\Support\Facades\File;
 
 use function Pest\Laravel\postJson;
@@ -16,11 +17,17 @@ beforeEach(function () {
     ->create([
       'exam_no' => $this->examNo,
     ]);
+  $this->contentFilePath = ContentFilePath::make($this->exam->event_id);
+  $this->contentFilePath->createFolders();
 });
 
 afterEach(function () {
   if (file_exists($this->filename)) {
     File::delete($this->filename);
+  }
+
+  if (is_dir($this->contentFilePath->getBaseFolder())) {
+    File::deleteDirectory($this->contentFilePath->getBaseFolder());
   }
 });
 

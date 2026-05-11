@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Model;
 class Event extends Model
 {
   use HasFactory;
+
   protected $fillable = [
     'id',
     'title',
@@ -31,16 +32,18 @@ class Event extends Model
     'external_content_id',
     'external_event_courses',
   ];
+
   protected $casts = [
     'uploaded_at' => 'datetime',
     'external_content_id' => 'integer',
   ];
 
-  function eventCourses(): Attribute
+  public function eventCourses(): Attribute
   {
     return Attribute::make(
       get: function ($value) {
-        $valueArr = json_decode($value ?? $this->event_courses, true) ?? [];
+        $valueArr = json_decode($value ?? '[]', true) ?? [];
+
         return collect($valueArr)->map(function ($item) {
           return new EventCourse($item);
         });
@@ -49,24 +52,26 @@ class Event extends Model
     );
   }
 
-  function isExternal()
+  public function isExternal()
   {
     return $this->external_content_id;
   }
 
-  function isNotExternal()
+  public function isNotExternal()
   {
     return !$this->external_content_id;
   }
 
-  function getEventCourses()
+  public function getEventCourses()
   {
     if (!$this->isExternal()) {
-      return $this->eventCourses;
+      return $this->event_courses;
     }
+
     return $this->external_event_courses;
   }
-  function findCourseSession($courseSessionId): CourseSession|array|null
+
+  public function findCourseSession($courseSessionId): CourseSession|array|null
   {
     return $this->getEventCourses()
       ->filter(
@@ -76,11 +81,12 @@ class Event extends Model
       ?->getCourseSession();
   }
 
-  function externalEventCourses(): Attribute
+  public function externalEventCourses(): Attribute
   {
     return Attribute::make(
       get: function ($value) {
-        $valueArr = json_decode($value, true) ?? [];
+        $valueArr = json_decode($value ?? '[]', true) ?? [];
+
         return collect($valueArr)->map(function ($item) {
           $eventCourse = new EventCourse($item);
           $courseSession = new CourseSession($item['course_session'] ?? []);
@@ -88,6 +94,7 @@ class Event extends Model
             $item['course_session']['course'] ?? []
           );
           $eventCourse->course_session = $courseSession;
+
           return $eventCourse;
         });
       },
@@ -100,7 +107,7 @@ class Event extends Model
   //   return $this->hasMany(EventCourse::class);
   // }
 
-  function exams()
+  public function exams()
   {
     return $this->hasMany(Exam::class);
   }

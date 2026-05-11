@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Helpers;
 
 use App\Models\Exam;
@@ -7,24 +8,26 @@ use App\Support\ExamProcess;
 class ExamHandler
 {
   const EXAM_TIME_ALLOWANCE = 100; // 100 seconds
+
   const EXAM_FILES_DIR = __DIR__ . '/../../public/exams/';
+
   const EXAM_FILE_EXT = 'edr';
 
-  function __construct()
+  public function __construct()
   {
   }
 
-  static function make(): self
+  public static function make(): self
   {
     return app(ExamHandler::class);
   }
 
   /**
    * This creates an exam file if it doesn't exits or updates it
-   * @param \App\Models\Exam $exam
-   * @param bool $forStart indentifies if this is for starting or resuming an exam
+   *
+   * @param  bool  $forStart  indentifies if this is for starting or resuming an exam
    */
-  function syncExamFile(Exam $exam, $forStart = true): ExamProcess
+  public function syncExamFile(Exam $exam, $forStart = true): ExamProcess
   {
     $contentRes = $this->getContent($exam->exam_no, $forStart);
 
@@ -60,7 +63,7 @@ class ExamHandler
     );
   }
 
-  function attemptQuestion(array $studentAttempts, $examNo): ExamProcess
+  public function attemptQuestion(array $studentAttempts, $examNo): ExamProcess
   {
     $content = $this->getContent($examNo);
 
@@ -70,7 +73,7 @@ class ExamHandler
 
     $examFileContent = $content->getExamTrack();
     $file = $content->getFile();
-    $savedAttempts = $examFileContent['attempts'];
+    $savedAttempts = $examFileContent['attempts'] ?? [];
 
     foreach ($studentAttempts as $questionId => $studentAttempt) {
       $savedAttempts[$questionId] = $studentAttempt;
@@ -86,7 +89,7 @@ class ExamHandler
     );
   }
 
-  function endExam($examNo): ExamProcess
+  public function endExam($examNo): ExamProcess
   {
     $content = $this->getContent($examNo, false);
 
@@ -108,7 +111,7 @@ class ExamHandler
   }
 
   /** Wasn't made private to allow for testing (Mocking) */
-  function saveFile($filename, $content)
+  public function saveFile($filename, $content)
   {
     return file_put_contents(
       $filename,
@@ -116,7 +119,7 @@ class ExamHandler
     );
   }
 
-  function deleteFile($examNo)
+  public function deleteFile($examNo)
   {
     $file = $this->getFullFilepath($examNo);
     if (file_exists($file)) {
@@ -125,9 +128,9 @@ class ExamHandler
   }
 
   /**
-   * @param Collection<int, \App\Models\Question> $questions
+   * @param  Collection<int, \App\Models\Question>  $questions
    */
-  function calculateScoreFromFile(Exam $exam, $questions): ExamProcess
+  public function calculateScoreFromFile(Exam $exam, $questions): ExamProcess
   {
     $ret = $this->getContent($exam->exam_no, false);
 
@@ -135,31 +138,42 @@ class ExamHandler
       return $ret;
     }
 
-    $size = $questions->count();
     $examFileContent = $ret->getExamTrack();
 
-    if (empty($examFileContent) || empty($examFileContent['attempts'])) {
+    return $this->calculateScoreFromAttempts(
+      $questions,
+      $examFileContent['attempts'] ?? []
+    );
+  }
+
+  public function calculateScoreFromAttempts(
+    $questions,
+    array $attempts
+  ): ExamProcess {
+    $size = $questions->count();
+
+    if (empty($attempts)) {
       return ExamProcess::success()->score(0)->numOfQuestions($size);
     }
 
     $score = 0;
-    $attempts = $examFileContent['attempts'];
     foreach ($questions as $question) {
       $attempt = $attempts[$question->id] ?? '';
       if ($question->answer === $attempt) {
         $score++;
       }
     }
+
     return ExamProcess::success()->score($score)->numOfQuestions($size);
   }
 
   /** Wasn't made private to allow for testing (Mocking) */
-  function getFullFilepath($examNo)
+  public function getFullFilepath($examNo)
   {
     return self::EXAM_FILES_DIR . "exam_$examNo." . self::EXAM_FILE_EXT;
   }
 
-  function getContent($examNo, $checkTime = true): ExamProcess
+  public function getContent($examNo, $checkTime = true): ExamProcess
   {
     $file = $this->getFullFilepath($examNo);
 
@@ -191,23 +205,25 @@ class ExamHandler
           ->file($file);
       }
     }
+
     /*//***********Check Exam Time**************/
     return ExamProcess::success()->examTrack($examTrackContent)->file($file);
   }
 
   /**
    * @return array {
-   *  exam: App\Models\Exam,
-   *  attempts: array {
-   *    question_id: attempt
-   *  }
-   * }
+   *               exam: App\Models\Exam,
+   *               attempts: array {
+   *               question_id: attempt
+   *               }
+   *               }
    */
-  function getExamTrack($file)
+  public function getExamTrack($file)
   {
     return json_decode(@file_get_contents($file), true);
   }
-  function getExamFileData($examNo)
+
+  public function getExamFileData($examNo)
   {
     return $this->getExamTrack($this->getFullFilepath($examNo))['exam'] ?? null;
   }

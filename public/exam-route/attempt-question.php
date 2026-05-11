@@ -9,7 +9,24 @@ $eventId = $post['event_id'] ?? null;
 $examNo = $post['exam_no'] ?? null;
 
 // dlog($post);
-$allAttempts = $post['attempts'];
+$allAttempts = $post['attempts'] ?? [];
+$theoryAttempts = $post['theory_attempts'] ?? [];
+
+if (!is_array($allAttempts)) {
+  $allAttempts = [];
+}
+
+if (is_array($theoryAttempts)) {
+  $allAttempts = array_merge($allAttempts, $theoryAttempts);
+}
+
+if (!$examNo) {
+  emitResponse([
+    'success' => false,
+    'message' => 'Exam number is required',
+  ]);
+  exit();
+}
 
 $ret = $examHandler->attemptQuestion($allAttempts, $examNo);
 

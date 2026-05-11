@@ -14,29 +14,32 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $general_instructions
  * @property ?\App\Models\Course $course
  * @property Collection<int, \App\Models\Question> $questions
+ * @property Collection<int, \App\Models\TheoryQuestion> $theory_questions
  * @property Collection<int, \App\Models\Instruction> $instructions
  * @property Collection<int, \App\Models\Passage> $passages
  */
 class CourseSession extends Model
 {
   use HasFactory;
+
   protected $guarded = [];
 
-  function course(): Attribute
+  public function course(): Attribute
   {
     return Attribute::make(
       get: function ($value) {
-        return new Course(json_decode($value, true) ?? []);
+        return new Course(json_decode($value ?? '[]', true) ?? []);
       },
       set: fn($value) => json_encode($value)
     );
   }
 
-  function questions(): Attribute
+  public function questions(): Attribute
   {
     return Attribute::make(
       get: function ($value) {
-        $valueArr = json_decode($value, true) ?? [];
+        $valueArr = json_decode($value ?? '[]', true) ?? [];
+
         return collect($valueArr)->map(function ($item) {
           return new Question($item);
         });
@@ -45,11 +48,26 @@ class CourseSession extends Model
     );
   }
 
-  function instructions(): Attribute
+  public function theoryQuestions(): Attribute
   {
     return Attribute::make(
       get: function ($value) {
-        $valueArr = json_decode($value, true) ?? [];
+        $valueArr = json_decode($value ?? '[]', true) ?? [];
+
+        return collect($valueArr)->map(function ($item) {
+          return new TheoryQuestion($item);
+        });
+      },
+      set: fn($value) => json_encode($value)
+    );
+  }
+
+  public function instructions(): Attribute
+  {
+    return Attribute::make(
+      get: function ($value) {
+        $valueArr = json_decode($value ?? '[]', true) ?? [];
+
         return collect($valueArr)->map(function ($item) {
           return new Institution($item);
         });
@@ -58,11 +76,12 @@ class CourseSession extends Model
     );
   }
 
-  function passage(): Attribute
+  public function passage(): Attribute
   {
     return Attribute::make(
       get: function ($value) {
-        $valueArr = json_decode($value, true) ?? [];
+        $valueArr = json_decode($value ?? '[]', true) ?? [];
+
         return collect($valueArr)->map(function ($item) {
           return new Passage($item);
         });

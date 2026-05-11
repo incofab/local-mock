@@ -23,6 +23,7 @@ use Illuminate\Database\Eloquent\Model;
 class Exam extends Model
 {
   use HasFactory;
+
   protected $casts = [
     'event_id' => 'integer',
     'num_of_questions' => 'integer',
@@ -33,6 +34,7 @@ class Exam extends Model
     'pause_time' => 'datetime',
     'uploaded_at' => 'datetime',
   ];
+
   protected $fillable = [
     'id',
     'event_id',
@@ -53,11 +55,12 @@ class Exam extends Model
     'upload_message',
   ];
 
-  function examCourses(): Attribute
+  public function examCourses(): Attribute
   {
     return Attribute::make(
       get: function ($value) {
         $valueArr = json_decode($value, true) ?? [];
+
         return collect($valueArr)->map(function ($item) {
           $examCourse = new ExamCourse($item);
           $courseSession = new CourseSession($item['course_session'] ?? []);
@@ -65,33 +68,39 @@ class Exam extends Model
             $item['course_session']['course'] ?? []
           );
           $examCourse->course_session = $courseSession;
+
           return $examCourse;
         });
       },
       set: fn($value) => json_encode($value)
     );
   }
-  function isActive()
+
+  public function isActive()
   {
     return $this->status === ExamStatus::Active;
   }
-  function isEnded()
+
+  public function isEnded()
   {
     return $this->status === ExamStatus::Ended;
   }
-  function isOngoing($examFileData)
+
+  public function isOngoing($examFileData)
   {
     $isEnded = ($examFileData['status'] ?? null) === ExamStatus::Ended->value;
+
     // info([$this->exam_no, $isEnded]);
     return !$isEnded && $this->status === ExamStatus::Active;
   }
-  function canExtendTime()
+
+  public function canExtendTime()
   {
     return $this->status === ExamStatus::Active ||
       $this->status === ExamStatus::Ended;
   }
 
-  function markAsStarted()
+  public function markAsStarted()
   {
     $this->fill([
       'start_time' => now(),
@@ -101,17 +110,22 @@ class Exam extends Model
     ])->save();
   }
 
-  function markAsEnded($totalScore, $totalNumOfQuestions, $attempts = [])
-  {
+  public function markAsEnded(
+    $totalScore,
+    $totalNumOfQuestions,
+    $attempts = [],
+    array $extra = []
+  ) {
     $this->fill([
       'status' => ExamStatus::Ended,
       'score' => $totalScore,
       'num_of_questions' => $totalNumOfQuestions,
       'attempts' => $attempts,
+      ...$extra,
     ])->save();
   }
 
-  function markAsPaused()
+  public function markAsPaused()
   {
     $this->fill([
       'status' => ExamStatus::Paused,
@@ -121,7 +135,7 @@ class Exam extends Model
     ])->save();
   }
 
-  function student(): Attribute
+  public function student(): Attribute
   {
     return Attribute::make(
       get: function ($value) {
@@ -132,13 +146,14 @@ class Exam extends Model
   }
 
   /** @return int the remaining time in seconds */
-  function getTimeRemaining()
+  public function getTimeRemaining()
   {
     $timeRemaining = now()->diffInSeconds($this->end_time);
+
     return $timeRemaining < 1 ? 0 : $timeRemaining;
   }
 
-  function event()
+  public function event()
   {
     return $this->belongsTo(Event::class);
   }

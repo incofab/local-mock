@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Actions;
 
 use App\Enums\ExamStatus;
@@ -11,15 +12,17 @@ use Illuminate\Support\Facades\File;
 class SyncEvents
 {
   private static $instance;
-  static function make(): static
+
+  public static function make(): static
   {
     if (!self::$instance) {
       self::$instance = new self();
     }
+
     return self::$instance;
   }
 
-  function all()
+  public function all()
   {
     $latestEvent = Event::latest()->first();
     $events = WebsiteHelper::make()->getEvents($latestEvent?->id);
@@ -28,7 +31,7 @@ class SyncEvents
     }
   }
 
-  function single(Event $event)
+  public function single(Event $event)
   {
     $eventData = WebsiteHelper::make()->getSingleEvent($event->id);
     if (empty($eventData)) {
@@ -37,7 +40,7 @@ class SyncEvents
     $event->fill(collect($eventData)->except('id')->toArray())->save();
   }
 
-  function saveToFile($event, $exams = [])
+  public function saveToFile($event, $exams = [])
   {
     $filePath = new ContentFilePath($event['id']);
     if (is_dir($filePath->getBaseFolder())) {
@@ -56,7 +59,9 @@ class SyncEvents
       );
       file_put_contents(
         $courseSessionFilename,
-        json_encode($eventCourse['course_session'])
+        json_encode(
+          $this->normalizeCourseSession($eventCourse['course_session'])
+        )
       );
     }
 
@@ -87,5 +92,16 @@ class SyncEvents
       new Event($event),
       $filePath->getImagesFolder()
     ))->run();
+  }
+
+  private function normalizeCourseSession(array $courseSession): array
+  {
+    $courseSession['questions'] = $courseSession['questions'] ?? [];
+    $courseSession['theory_questions'] =
+      $courseSession['theory_questions'] ?? [];
+    $courseSession['passages'] = $courseSession['passages'] ?? [];
+    $courseSession['instructions'] = $courseSession['instructions'] ?? [];
+
+    return $courseSession;
   }
 }

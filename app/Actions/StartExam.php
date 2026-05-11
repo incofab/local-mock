@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Actions;
 
 use App\Enums\ExamStatus;
@@ -9,83 +10,103 @@ use App\Models\Question;
 
 class StartExam
 {
-  private EventExamsHandler $eventExamHandler;
-  function __construct(private Exam $exam)
-  {
-    $this->eventExamHandler = new EventExamsHandler($exam->event);
-  }
+    private EventExamsHandler $eventExamHandler;
 
-  static function make(Exam $exam)
-  {
-    return new self($exam);
-  }
-
-  function getExamStartupData($start = true)
-  {
-    if (!$this->eventExamHandler->isDownloaded()) {
-      return failRes('This event has not been downloaded. Contact admin');
-    }
-    if ($start && $this->canStartExam()) {
-      $this->exam->markAsStarted();
+    public function __construct(private Exam $exam)
+    {
+        $this->eventExamHandler = new EventExamsHandler($exam->event);
     }
 
-    if ($this->exam->status === ExamStatus::Ended) {
-      return failRes('Exam has already ended');
+    public static function make(Exam $exam)
+    {
+        return new self($exam);
     }
 
-    $examHandler = new ExamHandler();
-    $ret = $examHandler->syncExamFile($this->exam);
-    if ($ret->isNotSuccessful()) {
-      return failRes($ret->getMessage());
+    public function getExamStartupData($start = true)
+    {
+        if (! $this->eventExamHandler->isDownloaded()) {
+            return failRes('This event has not been downloaded. Contact admin');
+        }
+        $isStarting = $start && $this->canStartExam();
+        if ($isStarting) {
+            $this->exam->markAsStarted();
+        }
+
+        if ($this->exam->status === ExamStatus::Ended) {
+            return failRes('Exam has already ended');
+        }
+
+        $examHandler = new ExamHandler;
+        $ret = $examHandler->syncExamFile($this->exam, ! $isStarting);
+        if ($ret->isNotSuccessful()) {
+            return failRes($ret->getMessage());
+        }
+
+        $ret = $examHandler->getContent($this->exam->exam_no);
+
+        if (empty($ret->getExamTrack())) {
+            $ret = failRes($ret->getMessage());
+        }
+
+        return successRes('', [
+            'exam' => $this->prepareExam($this->exam),
+            'exam_track' => $ret->getExamTrack(),
+        ]);
     }
 
-    $ret = $examHandler->getContent($this->exam->exam_no);
+    private function prepareExam(Exam $exam)
+    {
+        // $eventExamHandler = new EventExamsHandler($exam->event);
+        /** @var ExamCourse $examCourse */
+        foreach ($exam->exam_courses as $key => $examCourse) {
+            $courseSession = $this->eventExamHandler->getCourseSession(
+                $examCourse->course_session_id
+            );
+            if (! $courseSession) {
+                $courseSession = new \App\Models\CourseSession([
+                    'id' => $examCourse->course_session_id,
+                    'questions' => [],
+                    'theory_questions' => [],
+                ]);
+            }
+            $courseSession->questions = $courseSession->questions->map(function (
+                Question $item
+            ) {
+                $item->answer = null;
+                $item->answer_meta = null;
 
-    if (empty($ret->getExamTrack())) {
-      $ret = failRes($ret->getMessage());
+                return $item;
+            });
+            $courseSession->theory_questions = $courseSession->theory_questions->map(
+                function ($item) {
+                    $item->answer = null;
+                    $item->marking_scheme = null;
+
+                    return $item;
+                }
+            );
+            $examCourse->course_session = $courseSession;
+        }
+        $exam->event->event_courses = [];
+        $exam->event->external_event_courses = [];
+
+        return $exam;
     }
-    return successRes('', [
-      'exam' => $this->prepareExam($this->exam),
-      'exam_track' => $ret->getExamTrack(),
-    ]);
-  }
 
-  private function prepareExam(Exam $exam)
-  {
-    // $eventExamHandler = new EventExamsHandler($exam->event);
-    /** @var ExamCourse $examCourse */
-    foreach ($exam->exam_courses as $key => $examCourse) {
-      $courseSession = $this->eventExamHandler->getCourseSession(
-        $examCourse->course_session_id
-      );
-      $courseSession->questions = $courseSession->questions->map(function (
-        Question $item
-      ) {
-        $item->answer = null;
-        $item->answer_meta = null;
-        return $item;
-      });
-      $examCourse->course_session = $courseSession;
+    public function canStartExam()
+    {
+        return in_array($this->exam->status, [
+            ExamStatus::Pending,
+            ExamStatus::Paused,
+        ]);
+        // return empty($this->exam->start_time) || !empty($this->exam->pause_time);
     }
-    $exam->event->event_courses = [];
-    $exam->event->external_event_courses = [];
-    return $exam;
-  }
 
-  function canStartExam()
-  {
-    return in_array($this->exam->status, [
-      ExamStatus::Pending,
-      ExamStatus::Paused,
-    ]);
-    // return empty($this->exam->start_time) || !empty($this->exam->pause_time);
-  }
-
-  // function startExam()
-  // {
-  //   if (!$this->canStartExam()) {
-  //     return;
-  //   }
-  //   $this->exam->markAsStarted();
-  // }
+    // function startExam()
+    // {
+    //   if (!$this->canStartExam()) {
+    //     return;
+    //   }
+    //   $this->exam->markAsStarted();
+    // }
 }

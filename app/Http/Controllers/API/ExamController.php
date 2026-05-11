@@ -17,7 +17,7 @@ class ExamController extends Controller
   /**
    * Starts or resumes an exam
    */
-  function startExam(Request $request)
+  public function startExam(Request $request)
   {
     $request->validate([
       'exam_no' => ['required', 'string'],
@@ -32,6 +32,7 @@ class ExamController extends Controller
         'exam_no' => 'Exam record not found',
       ]);
     }
+
     return $this->examView($exam);
   }
 
@@ -43,6 +44,7 @@ class ExamController extends Controller
     }
 
     $exam = $res->exam;
+
     return $this->ok([
       'exam_track' => $res->exam_track,
       'exam' => $exam,
@@ -51,7 +53,7 @@ class ExamController extends Controller
     ]);
   }
 
-  function createExamByCode(Request $request)
+  public function createExamByCode(Request $request)
   {
     $request->validate([
       'event_code' => ['required', 'string', 'exists:events,code'],
@@ -62,6 +64,7 @@ class ExamController extends Controller
       ->where('code', $request->event_code)
       ->firstOrFail();
     $exam = $this->createExam($event, $request->student_code, $request->name);
+
     // info($exam->toArray());
     return $this->ok([
       'exam' => $exam,
@@ -95,16 +98,14 @@ class ExamController extends Controller
     ]);
     $exam
       ->fill([
-        'exam_courses' => $event->getEventCourses()->map(
-          fn($eventCourse) => [
-            'course_session_id' => $eventCourse->course_session_id,
-            'num_of_questions' => $eventCourse->num_of_questions,
-            'exam_id' => $exam->id,
-            'course_code' =>
-              $eventCourse->course_session['course']['course_code'] ?? '',
-            'session' => $eventCourse->course_session['session'] ?? '',
-          ]
-        ),
+        'exam_courses' => $event
+          ->getEventCourses()
+          ->map(
+            fn($eventCourse) => $this->makeExamCoursePayload(
+              $exam,
+              $eventCourse
+            )
+          ),
       ])
       ->save();
 
@@ -114,6 +115,26 @@ class ExamController extends Controller
       $filePath->examFilename($exam->exam_no),
       json_encode($exam)
     );
+
     return $exam;
+  }
+
+  private function makeExamCoursePayload(Exam $exam, $eventCourse): array
+  {
+    $courseSession = $eventCourse->course_session ?? [];
+    $theoryQuestions = collect($courseSession['theory_questions'] ?? []);
+
+    return [
+      'course_session_id' => $eventCourse->course_session_id,
+      'num_of_questions' => $eventCourse->num_of_questions,
+      'theory_score' => 0,
+      'theory_max_score' => $theoryQuestions->sum('marks'),
+      'theory_num_of_questions' => $theoryQuestions->count(),
+      'theory_question_scores' => null,
+      'theory_evaluated' => $theoryQuestions->isEmpty(),
+      'exam_id' => $exam->id,
+      'course_code' => $courseSession['course']['course_code'] ?? '',
+      'session' => $courseSession['session'] ?? '',
+    ];
   }
 }

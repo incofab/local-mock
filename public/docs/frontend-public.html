@@ -65,6 +65,13 @@
           <code>public/examiner</code>, with static JS/CSS bundles, manifest,
           Electron file, favicon, robots file, and local libraries.
         </p>
+        <div class="warning">
+          The current bundled local examiner JavaScript renders OBJ questions
+          only. The backend now exposes <code>course_session.theory_questions</code>
+          using the online API shape, so a theory-capable examiner build can
+          consume it. If replacing the examiner bundle, preserve offline paths
+          under <code>/cbt/public/</code> and the raw PHP attempt/end routes.
+        </div>
       </section>
 
       <section>

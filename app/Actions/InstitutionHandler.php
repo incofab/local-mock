@@ -1,7 +1,9 @@
 <?php
+
 namespace App\Actions;
 
 use App\Models\Institution;
+use App\Support\LocalApiFixture;
 use App\Support\Platform\PlatformUrl;
 use App\Support\Res;
 
@@ -10,40 +12,44 @@ class InstitutionHandler
   private static $instance;
 
   private ?Institution $institution = null;
+
   private $filename;
 
-  function __construct()
+  public function __construct()
   {
     $this->filename = public_path('institution-data.json');
   }
 
-  static function getInstance(): static
+  public static function getInstance(): static
   {
     if (!self::$instance) {
       self::$instance = new self();
     }
+
     return self::$instance;
   }
 
-  function save($data)
+  public function save($data)
   {
     file_put_contents($this->filename, json_encode($data, JSON_PRETTY_PRINT));
+    $this->institution = new Institution($data);
   }
 
   /** Only called when resetting the app */
-  function deleteFile()
+  public function deleteFile()
   {
     if (file_exists($this->filename)) {
       unlink($this->filename);
     }
+    $this->institution = null;
   }
 
-  function isRecorded(): bool
+  public function isRecorded(): bool
   {
     return file_exists($this->filename);
   }
 
-  function getInstitution(): Institution|null
+  public function getInstitution(): ?Institution
   {
     if ($this->institution) {
       return $this->institution;
@@ -62,8 +68,16 @@ class InstitutionHandler
     return $this->institution;
   }
 
-  function processInstitutionCode($code, $platform): Res
+  public function processInstitutionCode($code, $platform): Res
   {
+    $fixture = LocalApiFixture::make();
+    if ($fixture?->matchesInstitution($code, $platform)) {
+      $institution = $fixture->institution();
+      $this->save([...$institution, 'platform' => $platform]);
+
+      return successRes('Data recorded successfully');
+    }
+
     $url = PlatformUrl::make($platform, $code)->showInstitution();
     $res = http()->post($url);
     // dd($res->json(), $url);
@@ -72,6 +86,7 @@ class InstitutionHandler
     }
     $institution = $res->json('data');
     $this->save([...$institution, 'platform' => $platform]);
+
     return successRes('Data recorded successfully');
   }
 }

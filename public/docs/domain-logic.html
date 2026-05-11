@@ -33,12 +33,12 @@
           <thead><tr><th>Action</th><th>Methods</th><th>Behavior</th></tr></thead>
           <tbody>
             <tr><td><code>InstitutionHandler</code></td><td><code>getInstance</code>, <code>save</code>, <code>deleteFile</code>, <code>isRecorded</code>, <code>getInstitution</code>, <code>processInstitutionCode</code></td><td>Singleton manager for <code>public/institution-data.json</code>. Converts stored institution array into an <code>Institution</code> model.</td></tr>
-            <tr><td><code>SyncEvents</code></td><td><code>make</code>, <code>all</code>, <code>single</code>, <code>saveToFile</code></td><td>Syncs event records from remote and writes event content, course session JSON, exam JSON, and images to <code>public/content</code>.</td></tr>
+            <tr><td><code>SyncEvents</code></td><td><code>make</code>, <code>all</code>, <code>single</code>, <code>saveToFile</code></td><td>Syncs event records from remote and writes event content, course session JSON with OBJ and theory questions, exam JSON, and images to <code>public/content</code>.</td></tr>
             <tr><td><code>EventExamsHandler</code></td><td><code>isDownloaded</code>, <code>downloadEventContent</code>, <code>getCourseSession</code>, <code>getQuestions</code>, <code>listExams</code>, <code>getExam</code>, <code>uploadEventExams</code></td><td>Event-local facade around content files and result upload. Current download writing delegates to <code>SyncEvents::saveToFile()</code>.</td></tr>
             <tr><td><code>StartExam</code></td><td><code>make</code>, <code>getExamStartupData</code>, <code>canStartExam</code>, private <code>prepareExam</code></td><td>Starts pending/paused exams, syncs tracking file, loads course sessions, strips answers, and returns startup payload.</td></tr>
             <tr><td><code>EndExam</code></td><td><code>make</code>, <code>endEventExams</code>, <code>endExam</code></td><td>Scores active exams from local attempts. Refuses ended and non-active exams.</td></tr>
             <tr><td><code>ExtendExamTime</code></td><td><code>make</code>, <code>run</code></td><td>Reactivates exam, extends <code>end_time</code>, clears pause time, and syncs tracking file.</td></tr>
-            <tr><td><code>CompileEventImages</code></td><td><code>make</code>, <code>run</code>, private image helpers</td><td>Extracts image URLs from question, option, and answer metadata HTML and stores local image copies.</td></tr>
+            <tr><td><code>CompileEventImages</code></td><td><code>make</code>, <code>run</code>, private image helpers</td><td>Extracts image URLs from OBJ question/option/answer metadata HTML and theory question/answer/marking-scheme HTML, then stores local image copies.</td></tr>
             <tr><td><code>FakeData</code></td><td><code>run</code> and private HTTP fake builders</td><td>Registers HTTP fakes for tests using JSON payloads in <code>public/sample-data</code>.</td></tr>
           </tbody>
         </table>
@@ -70,6 +70,7 @@
           <tbody>
             <tr><td><code>ContentFilePath</code></td><td>Builds paths under <code>public/content/event_{id}</code>: base folder, <code>images/</code>, <code>exams/</code>, <code>exam_{exam_no}.json</code>, and <code>course_session_{id}.json</code>.</td></tr>
             <tr><td><code>ExamProcess</code></td><td>Fluent result object for exam file operations. Carries success, message, file path, exam track, time elapsed flag, exam-not-found flag, score, and question count.</td></tr>
+            <tr><td><code>LocalApiFixture</code></td><td>Reads <code>public/sample-data/local-api-fixture.json</code> or <code>LOCAL_MOCK_API_FIXTURE</code>. When the fixture institution matches the initialized code/platform, institution setup, event list/show/deep-show-by-code, event exams, and exam upload calls are served from JSON.</td></tr>
             <tr><td><code>Res</code></td><td>ArrayObject-style result wrapper used by actions and global <code>successRes()</code>/<code>failRes()</code>.</td></tr>
             <tr><td><code>WebsiteHelper</code></td><td>Remote platform client. Uses institution data to create a <code>PlatformUrl</code> and exposes event list/show/deep-show, exam list, upload, and deep-show-by-code calls.</td></tr>
             <tr><td><code>PlatformUrl</code></td><td>Abstract URL contract and factory. Chooses <code>EdumanagerUrl</code> or <code>MockExamscholarsUrl</code>.</td></tr>

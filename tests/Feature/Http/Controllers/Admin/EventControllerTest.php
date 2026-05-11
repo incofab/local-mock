@@ -1,9 +1,6 @@
 <?php
 
-use App\Actions\EndExam;
-use App\Actions\EventExamsHandler;
 use App\Actions\FakeData;
-use App\Actions\SyncEvents;
 use App\Enums\ExamStatus;
 use App\Models\Event;
 use App\Models\Exam;
@@ -11,13 +8,36 @@ use App\Models\User;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\get;
-use function Pest\Laravel\mock;
 use function Pest\Laravel\assertDatabaseHas;
 
 beforeEach(function () {
   $this->user = User::factory()->create();
   actingAs($this->user);
+
+  $instituionDataPath = public_path('institution-data.json');
+  $oldInstitutionHasData = file_exists($instituionDataPath)
+    ? file_get_contents($instituionDataPath)
+    : null;
+  $this->oldInstitutionData = null;
+  if ($oldInstitutionHasData) {
+    $this->oldInstitutionData = file_get_contents($instituionDataPath);
+  }
+
+  file_put_contents(
+    public_path('institution-data.json'),
+    file_get_contents(public_path('sample-data/sample-institution.json'))
+  );
   FakeData::make()->run();
+});
+
+afterEach(function () {
+  unlink(public_path('institution-data.json'));
+  if ($this->oldInstitutionData) {
+    file_put_contents(
+      public_path('institution-data.json'),
+      $this->oldInstitutionData
+    );
+  }
 });
 
 it('can display the index page', function () {

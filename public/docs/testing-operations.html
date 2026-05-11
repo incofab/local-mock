@@ -41,6 +41,7 @@
             <tr><td><code>./vendor/bin/pint</code></td><td>Format PHP code.</td></tr>
             <tr><td><code>sail artisan app:reset</code></td><td>Run <code>migrate:fresh</code> and delete local institution data.</td></tr>
             <tr><td><code>sail artisan app:reset-password {email|all} {password}</code></td><td>Reset one or up to 50 users' passwords.</td></tr>
+            <tr><td><code>sail artisan app:write-practice-api-fixture</code></td><td>Write <code>public/sample-data/local-api-fixture.json</code> with matching institution, event, exam, OBJ questions, and theory questions for manual practice testing.</td></tr>
           </tbody>
         </table>
       </section>
@@ -69,8 +70,8 @@
         </p>
         <ul>
           <li><code>tests/Feature/Helpers/ExamHandlerTest.php</code> covers exam file sync, attempt recording, file ending, time elapsed detection, and valid content loading.</li>
-          <li><code>tests/Feature/Http/Controllers/Admin/EventControllerTest.php</code> covers event index/show/sync/refresh/evaluate/download/upload and event-wide time extension using HTTP fakes from <code>FakeData</code>.</li>
-          <li><code>tests/Feature/Http/Controllers/API/ExamControllerTest.php</code> covers starting an exam, validation failure for unknown exam number, and startup failure for ended exams.</li>
+          <li><code>tests/Feature/Http/Controllers/Admin/EventControllerTest.php</code> covers event index/show/sync/refresh/evaluate/download/upload and event-wide time extension using HTTP fakes from <code>FakeData</code>. <code>FakeData::run()</code> also writes the sample institution JSON so <code>verify.institution</code> allows admin routes during tests.</li>
+          <li><code>tests/Feature/Http/Controllers/API/ExamControllerTest.php</code> covers starting an exam, validation failure for unknown exam number, and startup failure for ended exams. The setup creates the event content folder because startup requires downloaded content.</li>
           <li><code>tests/Unit/ExampleTest.php</code> and <code>tests/Feature/ExampleTest.php</code> are scaffold examples.</li>
         </ul>
       </section>

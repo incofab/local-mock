@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Actions;
 
 use App\Models\CourseSession;
@@ -12,12 +13,15 @@ use ZipArchive;
 class EventExamsHandler
 {
   private ContentFIlePath $filePath;
-  function __construct(private Event $event)
+
+  private array $courseSessions = [];
+
+  public function __construct(private Event $event)
   {
     $this->filePath = new ContentFilePath($event->id);
   }
 
-  function isDownloaded(): bool
+  public function isDownloaded(): bool
   {
     return is_dir($this->filePath->getBaseFolder());
   }
@@ -25,7 +29,7 @@ class EventExamsHandler
   /**
    * Download event and its exam details from the server
    */
-  function downloadEventContent()
+  public function downloadEventContent()
   {
     // Extend the PHP timeout to 120 minutes (7200 seconds)
     ini_set('max_execution_time', 2 * 60 * 60);
@@ -41,76 +45,90 @@ class EventExamsHandler
     // }
 
     SyncEvents::make()->saveToFile($event, $exams ?? []);
+
     /*
-    if (is_dir($this->filePath->getBaseFolder())) {
-      File::deleteDirectory($this->filePath->getBaseFolder());
-    }
-    $this->filePath->createFolders();
-
-    $eventCourses =
-      $event['external_content_id'] ?? false
-        ? $event['external_event_courses']
-        : $event['event_courses'];
-
-    foreach ($eventCourses as $eventCourse) {
-      $courseSessionFilename = $this->filePath->courseSessionFilename(
-        $eventCourse['course_session_id']
-      );
-      file_put_contents(
-        $courseSessionFilename,
-        json_encode($eventCourse['course_session'])
-      );
-    }
-
-    foreach ($exams as $examData) {
-      $examData['event_id'] = $this->event->id;
-      $exam = Exam::query()
-        ->where([
-          'exam_no' => $examData['exam_no'],
-          'event_id' => $examData['event_id'],
-        ])
-        ->first();
-      if ($exam) {
-        if ($exam->status !== ExamStatus::Pending) {
-          continue;
+        if (is_dir($this->filePath->getBaseFolder())) {
+          File::deleteDirectory($this->filePath->getBaseFolder());
         }
-        $exam->fill($examData)->save();
-      } else {
-        $exam = Exam::query()->create($examData);
-      }
+        $this->filePath->createFolders();
 
-      file_put_contents(
-        $this->filePath->examFilename($exam->exam_no),
-        json_encode($exam)
-      );
-    }
+        $eventCourses =
+          $event['external_content_id'] ?? false
+            ? $event['external_event_courses']
+            : $event['event_courses'];
 
-    (new CompileEventImages(
-      new Event($event),
-      $this->filePath->getImagesFolder()
-    ))->run();
-    */
+        foreach ($eventCourses as $eventCourse) {
+          $courseSessionFilename = $this->filePath->courseSessionFilename(
+            $eventCourse['course_session_id']
+          );
+          file_put_contents(
+            $courseSessionFilename,
+            json_encode($eventCourse['course_session'])
+          );
+        }
+
+        foreach ($exams as $examData) {
+          $examData['event_id'] = $this->event->id;
+          $exam = Exam::query()
+            ->where([
+              'exam_no' => $examData['exam_no'],
+              'event_id' => $examData['event_id'],
+            ])
+            ->first();
+          if ($exam) {
+            if ($exam->status !== ExamStatus::Pending) {
+              continue;
+            }
+            $exam->fill($examData)->save();
+          } else {
+            $exam = Exam::query()->create($examData);
+          }
+
+          file_put_contents(
+            $this->filePath->examFilename($exam->exam_no),
+            json_encode($exam)
+          );
+        }
+
+        (new CompileEventImages(
+          new Event($event),
+          $this->filePath->getImagesFolder()
+        ))->run();
+        */
     return successRes('Exams downloaded successfully');
   }
 
-  function getCourseSession($courseSessionId): CourseSession|null
+  public function getCourseSession($courseSessionId): ?CourseSession
   {
+    if (array_key_exists($courseSessionId, $this->courseSessions)) {
+      return $this->courseSessions[$courseSessionId];
+    }
+
     $content = @file_get_contents(
       $this->filePath->courseSessionFilename($courseSessionId)
     );
     $content = json_decode($content ?? '', true);
-    return $content ? new CourseSession($content) : null;
+
+    return $this->courseSessions[$courseSessionId] = $content
+      ? new CourseSession($content)
+      : null;
   }
+
   /**
    * @return \Illuminate\Database\Eloquent\Collection<int, \App\Models\Question>|null $questions
    */
-  function getQuestions($courseSessionId)
+  public function getQuestions($courseSessionId)
   {
     return $this->getCourseSession($courseSessionId)?->questions ?? [];
   }
 
+  public function getTheoryQuestions($courseSessionId)
+  {
+    return $this->getCourseSession($courseSessionId)?->theory_questions ?? [];
+  }
+
   /** @deprecated */
-  function listExams()
+  public function listExams()
   {
     // return $this->event->exams()->with('examCourses')->get();
     $examNos = $this->event->exams()->get()->pluck('exam_no')->toArray();
@@ -126,17 +144,19 @@ class EventExamsHandler
         $exams[] = new Exam($examData);
       }
     }
+
     return $exams;
   }
 
-  function getExam($examNo): Exam|null
+  public function getExam($examNo): ?Exam
   {
     $content = @file_get_contents($this->filePath->examFilename($examNo));
     $content = json_decode($content ?? '', true);
+
     return $content ? new Exam($content) : null;
   }
 
-  function uploadEventExams()
+  public function uploadEventExams()
   {
     $this->event
       ->exams()
@@ -162,6 +182,7 @@ class EventExamsHandler
         }
       });
     $this->event->fill(['uploaded_at' => now()])->save();
+
     return successRes('Event exams uploaded');
   }
 
