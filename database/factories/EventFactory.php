@@ -14,6 +14,7 @@ class EventFactory extends Factory
       'description' => $this->faker->paragraph,
       'duration' => $this->faker->numberBetween(20, 120),
       'status' => 'active',
+      'show_corrections' => false,
     ];
   }
 

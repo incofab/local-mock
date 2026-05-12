@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth as Auth;
 use App\Http\Controllers\Admin as Admin;
+use App\Http\Controllers\ExamCorrectionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,11 +20,13 @@ Route::get('/', function () {
     return redirect(route('admin.dashboard'));
 });
 
+Route::get('corrections', [ExamCorrectionController::class, 'index'])->name('corrections.index');
+
 Route::any('logout', [Auth\LoginController::class, 'logout'])->middleware('auth')->name('logout');
 
 Route::group(['middleware' => ['guest']], function() {
     Route::get('login', [Auth\LoginController::class, 'create'])->name('login');
-    Route::post('login', [Auth\LoginController::class, 'store']);//->middleware('throttle:login');
+    Route::post('login', [Auth\LoginController::class, 'store']); //->middleware('throttle:login');
     Route::get('register', [Auth\RegistrationController::class, 'create'])->name('register');
     Route::post('register', [Auth\RegistrationController::class, 'store']);
 });
@@ -40,9 +43,9 @@ Route::name('admin.')->middleware('auth', 'verify.institution')->prefix('admin/'
 
     Route::get('events/{event}/extend-time', [Admin\EventController::class, 'extentTimeView'])->name('events.extend-time');
     Route::post('events/{event}/extend-time', [Admin\EventController::class, 'extentTimeStore'])->name('events.extend-time.store');
-    
+
     Route::any('events/download-by-code', [Admin\EventController::class, 'downloadByEventCode'])->name('events.download-by-code');
-    
+
     Route::get('exams/events/{event}/index', [Admin\ExamController::class, 'index'])->name('exams.index');
     Route::get('exams/{exam}/evaluate', [Admin\ExamController::class, 'evaluateExam'])->name('exams.evaluate');
     Route::get('exams/{exam}/extend-time', [Admin\ExamController::class, 'extentTimeView'])->name('exams.extend-time');

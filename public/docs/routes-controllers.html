@@ -33,6 +33,7 @@
           <thead><tr><th>Route</th><th>Name</th><th>Handler</th><th>Behavior</th></tr></thead>
           <tbody>
             <tr><td><code>GET /</code></td><td>-</td><td>Closure</td><td>Redirects to admin dashboard.</td></tr>
+            <tr><td><code>GET /corrections</code></td><td><code>corrections.index</code></td><td><code>ExamCorrectionController::index</code></td><td>Public student page for entering an exam number or opening <code>?exam_no=...</code> directly to released corrections.</td></tr>
             <tr><td><code>ANY /logout</code></td><td><code>logout</code></td><td><code>LoginController::logout</code></td><td>Logs out authenticated user.</td></tr>
             <tr><td><code>GET /login</code></td><td><code>login</code></td><td><code>LoginController::create</code></td><td>Shows login or redirects to registration if institution setup is missing.</td></tr>
             <tr><td><code>POST /login</code></td><td>-</td><td><code>LoginController::store</code></td><td>Authenticates email/password.</td></tr>
@@ -79,6 +80,7 @@
           <thead><tr><th>Controller</th><th>Methods</th><th>Notes</th></tr></thead>
           <tbody>
             <tr><td><code>Controller</code></td><td><code>ok()</code>, <code>fail()</code></td><td>Base JSON helpers. <code>fail()</code> returns HTTP 401.</td></tr>
+            <tr><td><code>ExamCorrectionController</code></td><td><code>index</code> plus private correction data helpers</td><td>Public GET correction page. It only reveals corrections when the exam exists, the event has <code>show_corrections</code> enabled, the exam is ended, and theory-bearing courses are marked theory-evaluated.</td></tr>
             <tr><td><code>Admin\AdminController</code></td><td><code>index()</code></td><td>Returns <code>admin.index</code>.</td></tr>
             <tr><td><code>Admin\EventController</code></td><td><code>index</code>, <code>show</code>, <code>syncEvents</code>, <code>refreshEvent</code>, <code>evaluateEVent</code>, <code>download</code>, <code>uploadEventExams</code>, <code>extentTimeView</code>, <code>extentTimeStore</code>, <code>downloadByEventCode</code></td><td>Main admin event controller; delegates to actions and helpers.</td></tr>
             <tr><td><code>Admin\ExamController</code></td><td><code>index</code>, <code>evaluateExam</code>, <code>extentTimeView</code>, <code>extentTimeStore</code>, <code>editExamNo</code>, <code>updateExamNo</code>, <code>deleteExam</code></td><td>Admin exam list and per-exam operations.</td></tr>

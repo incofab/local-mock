@@ -17,7 +17,9 @@ if (!is_array($allAttempts)) {
 }
 
 if (is_array($theoryAttempts)) {
-  $allAttempts = array_merge($allAttempts, $theoryAttempts);
+  foreach ($theoryAttempts as $questionId => $studentAttempt) {
+    $allAttempts[$questionId] = $studentAttempt;
+  }
 }
 
 if (!$examNo) {
@@ -36,5 +38,5 @@ if ($ret->isNotSuccessful()) {
 
 emitResponse([
   'success' => true,
-  'data' => ['success' => array_values($allAttempts), 'failure' => []],
+  'data' => ['success' => $allAttempts, 'failure' => []],
 ]);

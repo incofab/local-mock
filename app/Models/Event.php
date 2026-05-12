@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $title
  * @property string $description
  * @property string $status
+ * @property bool $show_corrections
  * @property int $duration
  * @property int $external_content_id
  * @property Collection<int, \App\Models\EventCourse> $event_courses
@@ -27,6 +28,7 @@ class Event extends Model
     'description',
     'duration',
     'status',
+    'show_corrections',
     'code',
     'event_courses',
     'external_content_id',
@@ -36,6 +38,7 @@ class Event extends Model
   protected $casts = [
     'uploaded_at' => 'datetime',
     'external_content_id' => 'integer',
+    'show_corrections' => 'boolean',
   ];
 
   public function eventCourses(): Attribute

@@ -101,7 +101,7 @@
         <h2>Record Attempts and End from Examiner Client</h2>
         <ol>
           <li>The examiner app posts attempts to <code>public/exam-route/attempt-question.php</code>.</li>
-          <li>The script calls <code>ExamHandler::attemptQuestion()</code>, which merges attempts into the <code>.edr</code> file. Theory-capable clients should use non-colliding keys such as <code>theory-{question_id}</code>, matching the online examiner pattern.</li>
+          <li>The script calls <code>ExamHandler::attemptQuestion()</code>, which merges attempts into the <code>.edr</code> file as a keyed JSON object such as <code>{"9501":"C","9502":"C"}</code>. Theory-capable clients should use non-colliding keys such as <code>theory-{question_id}</code>, matching the online examiner pattern.</li>
           <li>The examiner app posts to <code>public/exam-route/end-exam.php</code> to mark the file's embedded exam status as ended.</li>
         </ol>
       </section>
@@ -124,6 +124,12 @@
           <li><code>EventExamsHandler::uploadEventExams()</code> chunks event exams by 100.</li>
           <li><code>WebsiteHelper::uploadExams()</code> posts results to the platform.</li>
           <li>Exam upload timestamps/messages and the event upload timestamp are updated locally.</li>
+        </ol>
+        <h3>Student Corrections</h3>
+        <ol>
+          <li>Students open <code>GET /corrections</code>, or a direct link such as <code>/corrections?exam_no=EXAM-NO</code>.</li>
+          <li><code>ExamCorrectionController::index()</code> loads the exam and event, then refuses display unless <code>events.show_corrections</code> is true and the exam has been evaluated. An evaluated exam is ended, and any course with theory questions must have <code>theory_evaluated</code> true.</li>
+          <li>When released, the page reads course-session content from <code>public/content/event_{id}</code>, combines it with <code>exams.attempts</code>, and renders course tabs with OBJ and theory tabs. OBJ options mark the correct option and the student's selected option; theory questions show the student's answer, expected answer, marking guide, and score when present.</li>
         </ol>
       </section>
     </main>

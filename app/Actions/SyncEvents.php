@@ -27,7 +27,10 @@ class SyncEvents
     $latestEvent = Event::latest()->first();
     $events = WebsiteHelper::make()->getEvents($latestEvent?->id);
     foreach ($events as $event) {
-      Event::firstOrCreate(['id' => $event['id']], $event);
+      Event::query()->updateOrCreate(
+        ['id' => $event['id']],
+        collect($event)->except('id')->toArray()
+      );
     }
   }
 

@@ -100,6 +100,33 @@ it('records a student attempt in the exam file', function () {
     ->toBe('Attempt recorded');
 });
 
+it('stores numeric question id attempts as a keyed json object', function () {
+  $handler = new ExamHandler();
+
+  $result = $handler->attemptQuestion(
+    [
+      9501 => 'C',
+      9502 => 'C',
+    ],
+    $this->examNo
+  );
+
+  $fileContent = file_get_contents($this->realTestFilePath);
+  $examTrack = json_decode($fileContent, true);
+
+  expect($result->isSuccessful())
+    ->toBeTrue()
+    ->and(array_is_list($examTrack['attempts']))
+    ->toBeFalse()
+    ->and($examTrack['attempts'][9501])
+    ->toBe('C')
+    ->and($examTrack['attempts'][9502])
+    ->toBe('C')
+    ->and($fileContent)
+    ->toContain('"9501": "C"')
+    ->toContain('"9502": "C"');
+});
+
 // Test the endExam method
 it('marks the exam as ended', function () {
   $handler = Mockery::mock(ExamHandler::class)->makePartial();

@@ -7,7 +7,7 @@
             <a href="{{route('admin.events.extend-time', $event)}}" class="btn btn-primary">
                 <i class="fa fa-clock"></i> Extend Time
             </a>
-            <a href="{{route('admin.events.evaluate', $event)}}" class="btn btn-success">
+            <a href="{{route('admin.events.evaluate', $event)}}" class="btn btn-success" onclick="return confirm('Do you want to evaluate all results')">
                 <i class="fa fa-reload"></i> Evaluate Results
             </a>
         </div>

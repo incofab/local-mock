@@ -71,6 +71,7 @@
         <ul>
           <li><code>tests/Feature/Helpers/ExamHandlerTest.php</code> covers exam file sync, attempt recording, file ending, time elapsed detection, and valid content loading.</li>
           <li><code>tests/Feature/Http/Controllers/Admin/EventControllerTest.php</code> covers event index/show/sync/refresh/evaluate/download/upload and event-wide time extension using HTTP fakes from <code>FakeData</code>. <code>FakeData::run()</code> also writes the sample institution JSON so <code>verify.institution</code> allows admin routes during tests.</li>
+          <li><code>tests/Feature/Http/Controllers/ExamCorrectionControllerTest.php</code> covers the public correction form view, show view, release/evaluation guards, rendered OBJ indicators, and theory correction display.</li>
           <li><code>tests/Feature/Http/Controllers/API/ExamControllerTest.php</code> covers starting an exam, validation failure for unknown exam number, and startup failure for ended exams. The setup creates the event content folder because startup requires downloaded content.</li>
           <li><code>tests/Unit/ExampleTest.php</code> and <code>tests/Feature/ExampleTest.php</code> are scaffold examples.</li>
         </ul>

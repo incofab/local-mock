@@ -41,6 +41,9 @@
             <tr><td><code>resources/views/admin/exams/index.blade.php</code></td><td>Exam table with student, status, score, subjects, countdown for ongoing exams, upload message, and per-exam actions.</td></tr>
             <tr><td><code>resources/views/admin/exams/extend-time.blade.php</code></td><td>Form for extending one exam.</td></tr>
             <tr><td><code>resources/views/admin/exams/edit-exam-no.blade.php</code></td><td>Form to correct a student's exam number.</td></tr>
+            <tr><td><code>resources/views/corrections/form.blade.php</code></td><td>Public student correction entry form and unavailable-result messages.</td></tr>
+            <tr><td><code>resources/views/corrections/show.blade.php</code></td><td>Released correction display with course tabs plus OBJ/theory tabs.</td></tr>
+            <tr><td><code>resources/views/corrections/layouts/app.blade.php</code></td><td>Shared correction page shell and local CSS. Correction form and result markup are kept directly in <code>form.blade.php</code> and <code>show.blade.php</code>.</td></tr>
             <tr><td><code>resources/views/auth/layout.blade.php</code></td><td>Auth shell.</td></tr>
             <tr><td><code>resources/views/auth/login.blade.php</code></td><td>Email/password login.</td></tr>
             <tr><td><code>resources/views/auth/register.blade.php</code></td><td>User registration plus institution code/platform setup.</td></tr>
@@ -80,7 +83,7 @@
           <thead><tr><th>Script</th><th>Behavior</th></tr></thead>
           <tbody>
             <tr><td><code>public/exam-route/exam-route-base.php</code></td><td>Sets CORS and JSON headers, handles OPTIONS preflight, includes <code>ExamHandler</code> and <code>ExamProcess</code>, defines <code>emitResponse()</code> and <code>dlog()</code>.</td></tr>
-            <tr><td><code>public/exam-route/attempt-question.php</code></td><td>Reads JSON input, gets <code>exam_no</code> and <code>attempts</code>, calls <code>ExamHandler::attemptQuestion()</code>, and returns success/failure arrays.</td></tr>
+            <tr><td><code>public/exam-route/attempt-question.php</code></td><td>Reads JSON input, gets <code>exam_no</code> and keyed <code>attempts</code>, preserves question-id keys when merging optional theory attempts, calls <code>ExamHandler::attemptQuestion()</code>, and returns success/failure maps.</td></tr>
             <tr><td><code>public/exam-route/end-exam.php</code></td><td>Reads JSON input, calls <code>ExamHandler::endExam($examNo)</code>, and returns success when the file update works.</td></tr>
             <tr><td><code>public/exam-route/exam-img.php</code></td><td>Serves images from <code>public/content/event_{event_id}/images/session_{course_session_id}_{filename}</code> with JPEG content type.</td></tr>
           </tbody>
