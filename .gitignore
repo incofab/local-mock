@@ -21,3 +21,7 @@ yarn-error.log
 /public/sample-data/local-api-fixture.json
 *.zip
 dummy.txt
+
+# Local Examiner
+/public/examiner-local-dev/*
+!/public/examiner-local-dev/lib
