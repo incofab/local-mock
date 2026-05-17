@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/cbt/public/examiner/static/css/main.7c75c0a8.css",
+    "main.js": "/cbt/public/examiner/static/js/main.520a4d6b.js",
+    "index.html": "/cbt/public/examiner/index.html",
+    "main.7c75c0a8.css.map": "/cbt/public/examiner/static/css/main.7c75c0a8.css.map",
+    "main.520a4d6b.js.map": "/cbt/public/examiner/static/js/main.520a4d6b.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.7c75c0a8.css",
+    "static/js/main.520a4d6b.js"
+  ]
+}
